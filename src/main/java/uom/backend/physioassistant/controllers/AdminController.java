@@ -48,14 +48,6 @@ public class AdminController implements Authentication {
                 .body(adminToAdd);
     }
 
-    @PostMapping("/create/physiotherapy_action")
-    public ResponseEntity<PhysioAction> createPhysioAction(@RequestBody PhysioAction service) {
-        this.physioActionService.createPhysioAction(service);
-
-        return ResponseEntity.ok()
-                .body(service);
-    }
-
     @Override
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
