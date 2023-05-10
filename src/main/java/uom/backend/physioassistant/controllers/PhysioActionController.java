@@ -32,6 +32,7 @@ public class PhysioActionController {
                 .body(action);
     }
 
+    // Will be used for R2
     @PostMapping("/create")
     public ResponseEntity<PhysioAction> createPhysioAction(@RequestBody PhysioAction action) {
         this.physioActionService.createPhysioAction(action);
