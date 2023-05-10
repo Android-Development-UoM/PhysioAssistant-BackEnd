@@ -42,6 +42,7 @@ public class DoctorController implements Authentication {
                 .body(doctor);
     }
 
+    // Will be used for R1
     @PostMapping("/create")
     public ResponseEntity<Doctor> createDoctor(@RequestBody Doctor doctor) {
         this.doctorService.createDoctor(doctor);
@@ -50,13 +51,16 @@ public class DoctorController implements Authentication {
                 .body(doctor);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable String id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity deleteById(@PathVariable String id) {
         doctorService.deleteById(id);
+
+        return ResponseEntity.ok()
+                .build();
     }
 
     @Override
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
