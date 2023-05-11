@@ -63,7 +63,7 @@ public class AdminController implements Authentication {
         Admin admin = this.adminUserService.getAdminById(username);
 
         String correctPassword = admin.getPassword();
-        System.out.println(correctPassword);
+
         boolean passwordIsCorrect = password.equals(correctPassword);
 
         if (passwordIsCorrect)

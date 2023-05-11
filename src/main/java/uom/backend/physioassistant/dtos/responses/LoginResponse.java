@@ -8,7 +8,6 @@ import uom.backend.physioassistant.models.users.User;
 public class LoginResponse {
     private User user;
     private String errorMessage;
-
     public LoginResponse(User user) {
         this.user = user;
     }
