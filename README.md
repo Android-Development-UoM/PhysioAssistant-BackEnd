@@ -6,7 +6,27 @@
   <img src="https://img.shields.io/badge/Back--End-blue" alt="Front-End" />
 </p>
 
-This is a Github repository created to store our assignment for the Android Development course at University of Macdenia.
+This is a Github repository created to store our assignment for the Android Development course at University of Macdenia. \
+The API was developed using SpringBoot framework and IntelliJ as the IDE. The API provides the ability to perform various CRUD (Create, Read, Update, Delete) operations on a database.
+
+# Getting Started
+
+## Prerequisites
+
+- Java 11 or higher
+- MySQL
+- IntelliJ or any other Java IDE
+
+## Installing
+
+1. Clone this repository
+2. Open the project in IntelliJ or your preferred IDE
+3. Configure the database credentials in `src/main/resources/application.properties`
+4. Run the application
+
+## API Documentation
+
+The API documentation is available at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) once the application is running.
 
 ## Cloning the Repository
 
@@ -38,37 +58,11 @@ We can make branches on own branches
 Once you have created your branch, you can make changes to the code and commit them to your branch.
 When we finish with changes on the code the team will evaluate it and merge the bracnhes on the master branch.
 
-## Github Desktop Instructions
+## Built With
 
-Github Desktop is a tool that makes it easy to work with Github repositories on your local machine. Here are some basic instructions for using Github Desktop:
+<div style="display: flex; flex-direction: row; align-items: center; justify-content: space-evenly;">
+    <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/spring/spring-original.svg" height="50" alt="Spring Boot" />
+<img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/mysql/mysql-original-wordmark.svg" height="100" alt="MySQL" />
+<img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/intellij/intellij-original-wordmark.svg" width="100" alt="IntelliJ IDEA" />
+</div>
 
-### Cloning a Repository
-
-1. Open Github Desktop and click on the "+" sign in the top left corner.
-2. Select "Clone repository".
-3. Choose the repository you want to clone from the list of repositories.
-4. Choose the location on your local machine where you want to save the repository.
-5. Click "Clone".
-
-### Creating a New Branch
-
-1. Open Github Desktop and select the "Current Branch" dropdown.
-2. Select "New Branch".
-3. Give your new branch a name that reflects the feature or bugfix you will be working on.
-4. Click "Create Branch".
-
-### Committing Changes
-
-1. Make changes to the code.
-2. Open Github Desktop and you will see the changes you made.
-3. Enter a commit message that describes the changes you made.
-4. Click "Commit to [branch name]".
-
-### Creating a Pull Request
-
-1. Go to the repository on Github.
-2. Click on the "Pull requests" tab.
-3. Click "New pull request".
-4. Select your branch as the "compare" branch and the master branch as the "base" branch.
-5. Review your changes and make sure everything looks good.
-6. Click "Create pull request".
