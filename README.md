@@ -10,7 +10,6 @@ This is a Github repository created to store our assignment for the Android Deve
 The API was developed using SpringBoot framework and IntelliJ as the IDE. The API provides the ability to perform various CRUD (Create, Read, Update, Delete) operations on a database.
 
 # Getting Started
-
 ## Prerequisites
 
 - Java 11 or higher
@@ -62,7 +61,7 @@ When we finish with changes on the code the team will evaluate it and merge the 
 
 <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-evenly;">
     <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/spring/spring-original.svg" height="50" alt="Spring Boot" />
-<img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/mysql/mysql-original-wordmark.svg" height="100" alt="MySQL" />
-<img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/intellij/intellij-original-wordmark.svg" width="100" alt="IntelliJ IDEA" />
+    <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/mysql/mysql-original-wordmark.svg" height="100" alt="MySQL" />
+    <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/intellij/intellij-original-wordmark.svg" width="100" alt="IntelliJ IDEA" />
 </div>
 
