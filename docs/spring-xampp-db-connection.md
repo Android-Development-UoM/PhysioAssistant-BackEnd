@@ -30,5 +30,5 @@ Note that if the database you created in phpMyAdmin is named `physio_assistant`,
 > **Note:** If you named your database `physio_assistant` in step 5, you can leave the `spring.datasource.url` property as is.
 >
 
-> **Note:** If you didn't set a username or password when installing XAMPP, you can leave the `spring.datasource.username` and `spring.datasource.password` properties as is (they have the xampp default values).
+> **Note:** If you didn't set a username or password when installing XAMPP, you can leave the `spring.datasource.username` and `spring.datasource.password` properties as is (they have the xampp default values - root and empty pass).
 >
