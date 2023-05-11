@@ -45,6 +45,14 @@ public class DoctorController implements Authentication {
     // Will be used for R1
     @PostMapping("/create")
     public ResponseEntity<Doctor> createDoctor(@RequestBody Doctor doctor) {
+        // Make sure the doctor is not already added
+        String givenId = doctor.getAfm();
+        Optional doctor_flag = this.doctorService.getById(givenId);
+
+        if (doctor_flag.isPresent())
+            return ResponseEntity.status(406)
+                    .build();
+
         this.doctorService.createDoctor(doctor);
 
         return ResponseEntity.ok()
