@@ -7,7 +7,6 @@ import uom.backend.physioassistant.models.appointment.Appointment;
 import uom.backend.physioassistant.models.appointment.AppointmentStatus;
 import uom.backend.physioassistant.services.AppointmentService;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -53,6 +52,38 @@ public class AppointmentController {
     @GetMapping("/patient")
     public ResponseEntity<List<Appointment>> getAppointmentsByPatientId(@RequestParam(name = "pid") String patientId) {
         List<Appointment> appointments = (List) this.appointmentService.getAppointmentsBasedOnPatientId(patientId);
+
+        return ResponseEntity.ok()
+                .body(appointments);
+    }
+
+    @GetMapping("/pending/patient")
+    public ResponseEntity<List<Appointment>> getPendingByPatientId(@RequestParam(name = "pid") String patientId) {
+        List<Appointment> appointments = (List) this.appointmentService.getPendingByPatientId(patientId);
+
+        return ResponseEntity.ok()
+                .body(appointments);
+    }
+
+    @GetMapping("/pending/doctor")
+    public ResponseEntity<List<Appointment>> getPendingByDoctorId(@RequestParam(name = "did") String doctorId) {
+        List<Appointment> appointments = (List) this.appointmentService.getPendingByDoctorId(doctorId);
+
+        return ResponseEntity.ok()
+                .body(appointments);
+    }
+
+    @GetMapping("/accepted/doctor")
+    public ResponseEntity<List<Appointment>> getAcceptedByDoctorId(@RequestParam(name = "did") String doctorId) {
+        List<Appointment> appointments = (List) this.appointmentService.getAcceptedByDoctorId(doctorId);
+
+        return ResponseEntity.ok()
+                .body(appointments);
+    }
+
+    @GetMapping("/accepted/patient")
+    public ResponseEntity<List<Appointment>> getAcceptedByPatientId(@RequestParam(name = "pid") String patientId) {
+        List<Appointment> appointments = (List) this.appointmentService.getAcceptedByPatientId(patientId);
 
         return ResponseEntity.ok()
                 .body(appointments);
