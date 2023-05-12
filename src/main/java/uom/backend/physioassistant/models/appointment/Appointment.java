@@ -32,6 +32,6 @@ public class Appointment {
     private LocalTime time;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(32) DEFAULT 'PENDING'")
-    private AppointmentStatus status;
+    @Column(nullable = false)
+    private AppointmentStatus status = AppointmentStatus.PENDING;
 }
