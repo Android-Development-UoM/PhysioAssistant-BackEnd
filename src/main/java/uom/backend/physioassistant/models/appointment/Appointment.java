@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uom.backend.physioassistant.models.users.Doctor;
+import uom.backend.physioassistant.models.users.Patient;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,11 +21,13 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String doctorId;
+    @ManyToOne
+    @JoinColumn(name = "doctor_id", referencedColumnName = "afm")
+    private Doctor doctor;
 
-    @Column(nullable = false)
-    private String patientId;
+    @ManyToOne
+    @JoinColumn(name = "patient_id", referencedColumnName = "amka")
+    private Patient patient;
 
     @Column(nullable = false)
     private LocalDate date;

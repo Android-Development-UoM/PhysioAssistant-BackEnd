@@ -3,11 +3,13 @@ package uom.backend.physioassistant.controllers;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uom.backend.physioassistant.dtos.models.AppointmentDTO;
 import uom.backend.physioassistant.models.appointment.Appointment;
 import uom.backend.physioassistant.models.appointment.AppointmentStatus;
 import uom.backend.physioassistant.services.AppointmentService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/appointments")
@@ -19,20 +21,24 @@ public class AppointmentController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Appointment>> getAllAppointments() {
+    public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
         List<Appointment> appointments = (List) this.appointmentService.getAllAppointments();
 
+        List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                .map(appointment -> new AppointmentDTO(appointment))
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok()
-                .body(appointments);
+                .body(appointmentDTOs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id) {
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
         try {
             Appointment appointment = this.appointmentService.getAppointmentById(id);
 
             return ResponseEntity.ok()
-                    .body(appointment);
+                    .body(new AppointmentDTO(appointment));
         }
         catch (EntityNotFoundException e) {
             return ResponseEntity.notFound()
@@ -41,52 +47,54 @@ public class AppointmentController {
     }
 
     @GetMapping("/doctor")
-    public ResponseEntity<List<Appointment>> getAppointmentsByDoctorId(@RequestParam(name = "did") String doctorId) {
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDoctorId(@RequestParam(name = "did") String doctorId) {
         System.out.println(doctorId);
         List<Appointment> appointments = (List) this.appointmentService.getAppointmentsBasedOnDoctorId(doctorId);
 
+        List<AppointmentDTO> appointmentDTOs = appointments
+                .stream().map(appointment -> new AppointmentDTO(appointment))
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok()
-                .body(appointments);
+                .body(appointmentDTOs);
     }
 
     @GetMapping("/patient")
-    public ResponseEntity<List<Appointment>> getAppointmentsByPatientId(@RequestParam(name = "pid") String patientId) {
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByPatientId(@RequestParam(name = "pid") String patientId) {
         List<Appointment> appointments = (List) this.appointmentService.getAppointmentsBasedOnPatientId(patientId);
 
+        List<AppointmentDTO> appointmentDTOs = appointments
+                .stream().map(appointment -> new AppointmentDTO(appointment))
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok()
-                .body(appointments);
+                .body(appointmentDTOs);
     }
 
-    @GetMapping("/pending/patient")
-    public ResponseEntity<List<Appointment>> getPendingByPatientId(@RequestParam(name = "pid") String patientId) {
-        List<Appointment> appointments = (List) this.appointmentService.getPendingByPatientId(patientId);
+    @GetMapping("/doctor/{doctorId}/status/{status}")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsForDoctorByStatus(
+            @PathVariable String doctorId, @PathVariable AppointmentStatus status
+    ){
+        List<Appointment> appointments = (List) this.appointmentService.getAllForDoctorByStatus(doctorId, status);
+        List<AppointmentDTO> appointmentDTOS = appointments
+                .stream().map(appointment -> new AppointmentDTO(appointment))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(appointments);
+                .body(appointmentDTOS);
     }
 
-    @GetMapping("/pending/doctor")
-    public ResponseEntity<List<Appointment>> getPendingByDoctorId(@RequestParam(name = "did") String doctorId) {
-        List<Appointment> appointments = (List) this.appointmentService.getPendingByDoctorId(doctorId);
+    @GetMapping("/patient/{patientId}/status/{status}")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsForPatientByStatus(
+            @PathVariable String patientId, @PathVariable AppointmentStatus status
+    ){
+        List<Appointment> appointments = (List) this.appointmentService.getAllForPatientByStatus(patientId, status);
+        List<AppointmentDTO> appointmentDTOS = appointments
+                .stream().map(appointment -> new AppointmentDTO(appointment))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(appointments);
-    }
-
-    @GetMapping("/accepted/doctor")
-    public ResponseEntity<List<Appointment>> getAcceptedByDoctorId(@RequestParam(name = "did") String doctorId) {
-        List<Appointment> appointments = (List) this.appointmentService.getAcceptedByDoctorId(doctorId);
-
-        return ResponseEntity.ok()
-                .body(appointments);
-    }
-
-    @GetMapping("/accepted/patient")
-    public ResponseEntity<List<Appointment>> getAcceptedByPatientId(@RequestParam(name = "pid") String patientId) {
-        List<Appointment> appointments = (List) this.appointmentService.getAcceptedByPatientId(patientId);
-
-        return ResponseEntity.ok()
-                .body(appointments);
+                .body(appointmentDTOS);
     }
 
     @PutMapping("/update/status")

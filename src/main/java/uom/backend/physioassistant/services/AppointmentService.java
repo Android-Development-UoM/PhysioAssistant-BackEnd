@@ -37,20 +37,12 @@ public class AppointmentService {
         return this.appointmentRepository.findAllByPatientId(patientId);
     }
 
-    public Collection<Appointment> getPendingByDoctorId(String doctorId) {
-        return this.appointmentRepository.findAllPendingByDoctorId(doctorId);
+    public Collection<Appointment> getAllForDoctorByStatus(String doctorId, AppointmentStatus status) {
+        return this.appointmentRepository.findAllForDoctorByStatus(doctorId, status);
     }
 
-    public Collection<Appointment> getPendingByPatientId(String patientId) {
-        return this.appointmentRepository.findAllPendingByPatientId(patientId);
-    }
-
-    public Collection<Appointment> getAcceptedByPatientId(String patientId) {
-        return this.appointmentRepository.findAllAcceptedByPatientId(patientId);
-    }
-
-    public Collection<Appointment> getAcceptedByDoctorId(String doctorId) {
-        return this.appointmentRepository.findAllAcceptedByDoctorId(doctorId);
+    public Collection<Appointment> getAllForPatientByStatus(String patientId, AppointmentStatus status) {
+        return this.appointmentRepository.findAllForPatientByStatus(patientId, status);
     }
 
     public void setAppointmentStatus(Long appointmentId, AppointmentStatus status) {
