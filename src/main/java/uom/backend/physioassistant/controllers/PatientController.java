@@ -12,6 +12,7 @@ import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.services.PatientService;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -51,6 +52,15 @@ public class PatientController implements Authentication {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .build();
         }
+    }
+
+
+    @GetMapping("/amka/{amka}")
+    public ResponseEntity<List<Patient>> getAllByDoctorIdAndAmka(@PathVariable String amka, @RequestParam(name = "did") String doctorId) {
+        List<Patient> patients = (List) this.patientService.getDoctorPatientsByAmka(doctorId, amka);
+
+        return ResponseEntity.ok()
+                .body(patients);
     }
 
     @PostMapping("/create")

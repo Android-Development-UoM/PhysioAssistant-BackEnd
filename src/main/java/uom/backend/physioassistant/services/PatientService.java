@@ -38,6 +38,10 @@ public class PatientService {
         return foundPatient.get();
     }
 
+    public Collection<Patient> getDoctorPatientsByAmka(String doctorId, String amka) {
+        return this.patientRepository.getAllByDoctorIdAndAmka(doctorId, amka);
+    }
+
     public Patient createPatient(CreatePatientRequest patientRequest) {
         // Make sure the patient is not already added
         String givenAMKA = patientRequest.getUsername();
