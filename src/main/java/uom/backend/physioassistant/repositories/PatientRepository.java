@@ -8,6 +8,9 @@ import java.util.Collection;
 
 public interface PatientRepository extends JpaRepository<Patient, String> {
     // Get Patients by Doctor ID
-    @Query("SELECT p FROM Patient p WHERE p.doctor.afm = ?1")
+    @Query("SELECT p FROM Patient p WHERE p.doctor.username = ?1")
     Collection<Patient> getAllByDoctorId(String doctorId);
+
+    @Query("SELECT p FROM Patient p WHERE p.doctor")
+    Collection<Patient> getAllByDoctorIdAndAmka(String doctorId, String amka);
 }
