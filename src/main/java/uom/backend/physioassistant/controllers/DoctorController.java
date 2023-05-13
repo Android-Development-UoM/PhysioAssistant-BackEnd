@@ -51,9 +51,6 @@ public class DoctorController implements Authentication {
     public ResponseEntity<Doctor> createDoctor(@RequestBody Doctor doctor) {
         // Make sure the doctor is not already added
         try {
-            String givenId = doctor.getAfm();
-            Doctor foundDoctor = this.doctorService.getById(givenId);
-
             this.doctorService.createDoctor(doctor);
 
             return ResponseEntity.ok()
