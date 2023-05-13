@@ -1,6 +1,7 @@
 package uom.backend.physioassistant.models.users;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,8 @@ import lombok.Setter;
 @Getter @Setter
 @MappedSuperclass
 public abstract class User {
+    @Id
+    private String username;
     @Column(nullable = false)
     private String password;
 }

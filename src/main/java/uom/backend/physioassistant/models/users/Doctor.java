@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter @Setter
 @Table(name = "doctor")
 public class Doctor extends User{
-    @Id
+    @Column(nullable = false)
     private String afm;
     @Column(nullable = false)
     private String name;

@@ -12,13 +12,13 @@ import lombok.Setter;
 @Getter @Setter
 @Table(name = "patient")
 public class Patient extends User{
-    @Id
+    @Column(nullable = false)
     private String amka;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String address;
     @ManyToOne
-    @JoinColumn(name = "doctor_id", referencedColumnName = "afm")
+    @JoinColumn(name = "doctor_id", referencedColumnName = "username")
     private Doctor doctor;
 }

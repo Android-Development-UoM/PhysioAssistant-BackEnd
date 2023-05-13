@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
 @Table(name = "admin")
-public class Admin extends User {
-    @Id
-    private String username;
-}
+public class Admin extends User { }

@@ -12,6 +12,7 @@ public class CreatePatientRequest {
     private String amka;
     private String name;
     private String address;
+    private String username;
     private String password;
     private String doctorId;
 }

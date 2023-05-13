@@ -48,6 +48,7 @@ public class PatientService {
 
         String givenName = patientRequest.getName();
         String givenAddress = patientRequest.getAddress();
+        String givenUsername = patientRequest.getUsername();
         String givenPassword = patientRequest.getPassword();
         String doctorId = patientRequest.getDoctorId();
 
@@ -58,6 +59,7 @@ public class PatientService {
         patient.setName(givenName);
         patient.setDoctor(doctor);
         patient.setAddress(givenAddress);
+        patient.setUsername(givenUsername);
         patient.setPassword(givenPassword);
 
         return patientRepository.save(patient);

@@ -31,11 +31,17 @@ public class DoctorService {
         return foundDoctor.get();
     }
 
+    public Optional<Doctor> getOptionalById(String id) {
+        return this.doctorRepository.findById(id);
+    }
+
     public void deleteById(String id) {
         Doctor foundDoctor = this.getById(id);
 
         this.doctorRepository.delete(foundDoctor);
     }
+    
+
 
     public Doctor createDoctor(Doctor doctor) {
         String givenAFM = doctor.getAfm();
