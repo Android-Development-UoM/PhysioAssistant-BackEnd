@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uom.backend.physioassistant.dtos.models.AppointmentDTO;
+import uom.backend.physioassistant.dtos.requests.CreateAppointmentRequest;
 import uom.backend.physioassistant.models.appointment.Appointment;
 import uom.backend.physioassistant.models.appointment.AppointmentStatus;
 import uom.backend.physioassistant.services.AppointmentService;
@@ -114,8 +115,8 @@ public class AppointmentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-        Appointment createdAppointment = this.appointmentService.createAppointment(appointment);
+    public ResponseEntity<Appointment> createAppointment(@RequestBody CreateAppointmentRequest appointmentRequest) {
+        Appointment createdAppointment = this.appointmentService.createAppointment(appointmentRequest);
 
         return ResponseEntity.ok()
                 .body(createdAppointment);
