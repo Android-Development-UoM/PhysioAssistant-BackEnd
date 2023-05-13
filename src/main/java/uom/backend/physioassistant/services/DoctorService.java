@@ -44,7 +44,7 @@ public class DoctorService {
 
 
     public Doctor createDoctor(Doctor doctor) {
-        String givenAFM = doctor.getAfm();
+        String givenAFM = doctor.getUsername();
         Optional<Doctor> foundDoctor = this.doctorRepository.findById(givenAFM);
 
         if (foundDoctor.isPresent())

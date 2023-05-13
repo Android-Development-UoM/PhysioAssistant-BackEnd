@@ -9,13 +9,10 @@ import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
-import uom.backend.physioassistant.exceptions.NotFoundException;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.services.PatientService;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/patients")

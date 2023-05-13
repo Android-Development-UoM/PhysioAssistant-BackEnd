@@ -40,7 +40,7 @@ public class PatientService {
 
     public Patient createPatient(CreatePatientRequest patientRequest) {
         // Make sure the patient is not already added
-        String givenAMKA = patientRequest.getAmka();
+        String givenAMKA = patientRequest.getUsername();
         Optional<Patient> foundPatient = patientRepository.findById(givenAMKA);
 
         if (foundPatient.isPresent())
