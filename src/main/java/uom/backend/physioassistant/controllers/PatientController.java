@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uom.backend.physioassistant.auth.Authentication;
+import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
@@ -48,9 +49,9 @@ public class PatientController implements Authentication {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
+    public ResponseEntity<Patient> createPatient(@RequestBody CreatePatientRequest patientRequest) {
         try {
-            Patient addedPatient = patientService.createPatient(patient);
+            Patient addedPatient = patientService.createPatient(patientRequest);
 
             return ResponseEntity.ok()
                     .body(addedPatient);
