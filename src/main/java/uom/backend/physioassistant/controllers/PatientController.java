@@ -1,15 +1,18 @@
 package uom.backend.physioassistant.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uom.backend.physioassistant.auth.Authentication;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
+import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.exceptions.NotFoundException;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.services.PatientService;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,28 +35,43 @@ public class PatientController implements Authentication {
 
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable String id) {
-        Optional<Patient> foundPatient = patientService.getPatientById(id);
+        try {
+            Patient foundPatient = patientService.getPatientById(id);
 
-        if (foundPatient.isEmpty())
-            throw new NotFoundException("Patient with AMKA: " + id + " not found.");
-
-        return ResponseEntity.ok()
-                .body(foundPatient.get());
+            return ResponseEntity.ok()
+                    .body(foundPatient);
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
     }
 
     @PostMapping("/create")
     public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
-        Patient addedPatient = patientService.createPatient(patient);
+        try {
+            Patient addedPatient = patientService.createPatient(patient);
 
-        return ResponseEntity.ok()
-                .body(addedPatient);
+            return ResponseEntity.ok()
+                    .body(addedPatient);
+        }
+        catch (AlreadyAddedException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity deletePatient(@PathVariable String id) {
-        patientService.deletePatientById(id);
-        return ResponseEntity.ok()
-                .build();
+        try {
+            patientService.deletePatientById(id);
+            return ResponseEntity.ok()
+                    .build();
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
     }
 
     @Override
@@ -62,21 +80,20 @@ public class PatientController implements Authentication {
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
 
-        Optional<Patient> foundPatient = patientService.getPatientById(username);
+        try {
+            Patient foundPatient = patientService.getPatientById(username);
+            String correctPassword = foundPatient.getPassword();
 
-        // Patient not found
-        if (foundPatient.isEmpty())
+            // Check if password is correct
+            if (password.equals(correctPassword))
+                return ResponseEntity.ok(new LoginResponse(foundPatient));
+            else
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new LoginResponse("Wrong username or password."));
+        }
+        catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponse("Wrong username or password."));
-
-        // Check if password is correct
-        Patient patient = foundPatient.get();
-        String correctPassword = patient.getPassword();
-
-        if (password.equals(correctPassword))
-            return ResponseEntity.ok(new LoginResponse(patient));
-        else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse("Wrong username or password."));
+        }
     }
 }

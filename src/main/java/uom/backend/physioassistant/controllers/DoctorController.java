@@ -1,11 +1,13 @@
 package uom.backend.physioassistant.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uom.backend.physioassistant.auth.Authentication;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
+import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.exceptions.NotFoundException;
 import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.services.DoctorService;
@@ -32,31 +34,35 @@ public class DoctorController implements Authentication {
 
     @GetMapping("/{id}")
     public ResponseEntity<Doctor> getDoctorById(@PathVariable String id) {
-        Optional<Doctor> foundDoctor = doctorService.getById(id);
+        try{
+            Doctor doctor = this.doctorService.getById(id);
 
-        if (foundDoctor.isEmpty())
-            throw new NotFoundException("Doctor with id: " + id + " not found.");
-
-        Doctor doctor = foundDoctor.get();
-        return ResponseEntity.ok()
-                .body(doctor);
+            return ResponseEntity.ok()
+                    .body(doctor);
+        }
+        catch (EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
     }
 
     // Will be used for R1
     @PostMapping("/create")
     public ResponseEntity<Doctor> createDoctor(@RequestBody Doctor doctor) {
         // Make sure the doctor is not already added
-        String givenId = doctor.getAfm();
-        Optional doctor_flag = this.doctorService.getById(givenId);
+        try {
+            String givenId = doctor.getAfm();
+            Doctor foundDoctor = this.doctorService.getById(givenId);
 
-        if (doctor_flag.isPresent())
-            return ResponseEntity.status(406)
+            this.doctorService.createDoctor(doctor);
+
+            return ResponseEntity.ok()
+                    .body(doctor);
+        }
+        catch (AlreadyAddedException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                     .build();
-
-        this.doctorService.createDoctor(doctor);
-
-        return ResponseEntity.ok()
-                .body(doctor);
+        }
     }
 
     @DeleteMapping("/delete/{id}")
@@ -73,21 +79,22 @@ public class DoctorController implements Authentication {
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
 
-        Optional<Doctor> foundDoctor = doctorService.getById(username);
+        try {
+            Doctor foundDoctor = doctorService.getById(username);
+            String correctPassword = foundDoctor.getPassword();
 
-        // Doctor not found
-        if (foundDoctor.isEmpty())
+            // Validate Password
+            if (password.equals(correctPassword))
+                return ResponseEntity.ok(new LoginResponse(foundDoctor));
+            else
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new LoginResponse("Wrong username or password."));
+        }
+        catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponse("Wrong username or password."));
+        }
 
-        // Check if password is correct
-        Doctor doctor = foundDoctor.get();
-        String correctPassword = doctor.getPassword();
 
-        if (password.equals(correctPassword))
-            return ResponseEntity.ok(new LoginResponse(doctor));
-        else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse("Wrong username or password."));
     }
 }

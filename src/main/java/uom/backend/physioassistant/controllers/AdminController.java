@@ -1,5 +1,6 @@
 package uom.backend.physioassistant.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,10 +35,16 @@ public class AdminController implements Authentication {
 
     @GetMapping("/{id}")
     public ResponseEntity<Admin> getAdminById(@PathVariable String id) {
-        Admin found_admin =  adminUserService.getAdminById(id);
+        try {
+            Admin found_admin =  adminUserService.getAdminById(id);
 
-        return ResponseEntity.ok()
-                .body(found_admin);
+            return ResponseEntity.ok()
+                    .body(found_admin);
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .build();
+        }
     }
 
     @PostMapping("/create")

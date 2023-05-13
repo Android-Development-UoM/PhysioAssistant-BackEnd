@@ -1,5 +1,6 @@
 package uom.backend.physioassistant.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.exceptions.NotFoundException;
@@ -21,18 +22,19 @@ public class DoctorService {
         return doctorRepository.findAll();
     }
 
-    public Optional<Doctor> getById(String id) {
-        return doctorRepository.findById(id);
+    public Doctor getById(String id) {
+        Optional<Doctor> foundDoctor = this.doctorRepository.findById(id);
+
+        if (foundDoctor.isEmpty())
+            throw new EntityNotFoundException("Doctor with id: " + id + " not found.");
+
+        return foundDoctor.get();
     }
 
     public void deleteById(String id) {
-        Optional<Doctor> foundDoctor = this.getById(id);
+        Doctor foundDoctor = this.getById(id);
 
-        // User not found
-        if (foundDoctor.isEmpty())
-            throw new NotFoundException("User with id: " + id + " not found.");
-
-        this.doctorRepository.delete(foundDoctor.get());
+        this.doctorRepository.delete(foundDoctor);
     }
 
     public Doctor createDoctor(Doctor doctor) {

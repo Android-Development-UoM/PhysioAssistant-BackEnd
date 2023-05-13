@@ -1,5 +1,6 @@
 package uom.backend.physioassistant.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
@@ -27,7 +28,7 @@ public class AdminUserService {
         Optional<Admin> foundAdmin = this.adminUserRepository.findById(id);
 
         if(foundAdmin.isEmpty())
-            throw  new NotFoundException("User with id: " + id + " not found.");
+            throw  new EntityNotFoundException("User with id: " + id + " not found.");
 
         return foundAdmin.get();
     }
