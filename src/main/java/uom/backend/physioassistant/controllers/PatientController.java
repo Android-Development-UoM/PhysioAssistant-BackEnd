@@ -34,6 +34,14 @@ public class PatientController implements Authentication {
                 .body(patients);
     }
 
+    @GetMapping("/doctor")
+    public ResponseEntity<List> getAllPatientsByDoctorId(@RequestParam(name = "did") String doctorId) {
+        List<Patient> patients = (List) patientService.getAllPatientsByDoctorId(doctorId);
+
+        return ResponseEntity.ok()
+                .body(patients);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable String id) {
         try {

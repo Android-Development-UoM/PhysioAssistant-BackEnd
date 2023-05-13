@@ -25,6 +25,10 @@ public class PatientService {
         return patientRepository.findAll();
     }
 
+    public Collection<Patient> getAllPatientsByDoctorId(String doctorId) {
+        return patientRepository.getAllByDoctorId(doctorId);
+    }
+
     public Patient getPatientById(String id) {
         Optional<Patient> foundPatient = patientRepository.findById(id);
 
