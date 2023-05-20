@@ -3,7 +3,6 @@ package uom.backend.physioassistant.controllers;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uom.backend.physioassistant.dtos.models.AppointmentDTO;
 import uom.backend.physioassistant.dtos.requests.CreateAppointmentRequest;
 import uom.backend.physioassistant.models.appointment.Appointment;
 import uom.backend.physioassistant.models.appointment.AppointmentStatus;
