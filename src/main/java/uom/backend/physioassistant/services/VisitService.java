@@ -13,14 +13,10 @@ import java.util.List;
 @Service
 public class VisitService {
     private final VisitRepository visitRepository;
-    private final PatientService patientService;
-    private final DoctorService doctorService;
     private final AppointmentService appointmentService;
 
-    public VisitService(VisitRepository visitRepository, PatientService patientService, DoctorService doctorService, AppointmentService appointmentService) {
+    public VisitService(VisitRepository visitRepository, AppointmentService appointmentService) {
         this.visitRepository = visitRepository;
-        this.patientService = patientService;
-        this.doctorService = doctorService;
         this.appointmentService = appointmentService;
     }
 
@@ -35,7 +31,7 @@ public class VisitService {
     public Visit createVisit(CreateVisitRequest visitRequest) {
         // FInd the visit appointment
         Long appointmentId = visitRequest.getAppointmentId();
-        System.out.println(appointmentId);
+
         Appointment appointment = appointmentService.getAppointmentById(appointmentId);
 
         List<PhysioAction> services = (List<PhysioAction>) visitRequest.getServices();
