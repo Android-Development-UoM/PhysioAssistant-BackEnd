@@ -63,10 +63,16 @@ Once you have created your branch, you can make changes to the code and commit t
 When we finish with changes on the code the team will evaluate it and merge the bracnhes on the master branch.
 
 ## Built With
-
-<div style="display: flex; flex-direction: row; align-items: center; justify-content: space-evenly;">
-    <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/spring/spring-original.svg" height="50" alt="Spring Boot" />
-    <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/mysql/mysql-original-wordmark.svg" height="100" alt="MySQL" />
-    <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/intellij/intellij-original-wordmark.svg" width="100" alt="IntelliJ IDEA" />
-</div>
-
+<table style="border:none;">
+  <tr>
+    <td valign="top">
+      <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/spring/spring-original.svg" height="125" alt="Spring Boot" />
+    </td>
+    <td valign="top">
+      <img src="https://raw.githubusercontent.com/ArchontisKostis/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/mysql/mysql-original-wordmark.svg" height="125" alt="MySQL" />
+    </td>
+    <td valign="top">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/IntelliJ_IDEA_Icon.svg" width="125" alt="IntelliJ IDEA" />
+    </td>
+  </tr>
+</table>
