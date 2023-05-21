@@ -8,12 +8,10 @@ import uom.backend.physioassistant.auth.Authentication;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
-import uom.backend.physioassistant.exceptions.NotFoundException;
 import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.services.DoctorService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/doctors")
