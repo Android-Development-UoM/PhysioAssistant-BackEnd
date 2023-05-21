@@ -46,7 +46,7 @@ public class DoctorController implements Authentication {
 
     // Will be used for R1
     @PostMapping("/create")
-    public ResponseEntity<Doctor> createDoctor(@RequestBody Doctor doctor) {
+    public ResponseEntity<?> createDoctor(@RequestBody Doctor doctor) {
         // Make sure the doctor is not already added
         try {
             this.doctorService.createDoctor(doctor);
@@ -55,8 +55,14 @@ public class DoctorController implements Authentication {
                     .body(doctor);
         }
         catch (AlreadyAddedException e) {
+            String errorMsg = "Ο Γιατρός με username: " + doctor.getUsername();
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .build();
+                    .body(errorMsg);
+        }
+        catch (Exception e) {
+            String errorMsg = "Παρουσιάστηκε σφάλμα κατά τη δημιουργία του γιατρού.";
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(errorMsg);
         }
     }
 
@@ -83,13 +89,11 @@ public class DoctorController implements Authentication {
                 return ResponseEntity.ok(new LoginResponse(foundDoctor));
             else
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new LoginResponse("Wrong username or password."));
+                        .body(new LoginResponse("Λάθος username ή/και password."));
         }
         catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse("Wrong username or password."));
+                    .body(new LoginResponse("To username: " + loginRequest.getUsername() + " δεν αντιστοιχεί σε κάποιον χρήστη."));
         }
-
-
     }
 }
