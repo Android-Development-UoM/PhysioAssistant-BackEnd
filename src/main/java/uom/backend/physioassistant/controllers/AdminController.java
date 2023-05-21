@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uom.backend.physioassistant.auth.Authentication;
-import uom.backend.physioassistant.models.PhysioAction;
 import uom.backend.physioassistant.models.users.Admin;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
