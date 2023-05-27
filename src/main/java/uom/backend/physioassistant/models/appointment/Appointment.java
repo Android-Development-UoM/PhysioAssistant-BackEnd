@@ -1,5 +1,6 @@
 package uom.backend.physioassistant.models.appointment;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,10 +24,12 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "doctor_id", referencedColumnName = "username")
+    @JsonIgnore
     private Doctor doctor;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", referencedColumnName = "username")
+    @JsonIgnore
     private Patient patient;
 
     @Column(nullable = false)

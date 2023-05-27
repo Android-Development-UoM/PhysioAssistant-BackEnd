@@ -3,7 +3,6 @@ package uom.backend.physioassistant.services;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
-import uom.backend.physioassistant.exceptions.NotFoundException;
 import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.repositories.DoctorRepository;
 
@@ -40,8 +39,6 @@ public class DoctorService {
 
         this.doctorRepository.delete(foundDoctor);
     }
-    
-
 
     public Doctor createDoctor(Doctor doctor) {
         String givenAFM = doctor.getUsername();
