@@ -5,6 +5,7 @@ import uom.backend.physioassistant.dtos.requests.CreateVisitRequest;
 import uom.backend.physioassistant.models.PhysioAction;
 import uom.backend.physioassistant.models.Visit;
 import uom.backend.physioassistant.models.appointment.Appointment;
+import uom.backend.physioassistant.models.appointment.AppointmentStatus;
 import uom.backend.physioassistant.repositories.VisitRepository;
 
 import java.util.Collection;
@@ -32,6 +33,7 @@ public class VisitService {
         // FInd the visit appointment
         Long appointmentId = visitRequest.getAppointmentId();
 
+        this.appointmentService.setAppointmentStatus(appointmentId, AppointmentStatus.DONE);
         Appointment appointment = appointmentService.getAppointmentById(appointmentId);
 
         List<PhysioAction> services = (List<PhysioAction>) visitRequest.getServices();

@@ -29,7 +29,6 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "patient_id", referencedColumnName = "username")
-    @JsonIgnore
     private Patient patient;
 
     @Column(nullable = false)

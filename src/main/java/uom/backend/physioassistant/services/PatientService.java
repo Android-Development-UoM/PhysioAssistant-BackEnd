@@ -1,5 +1,6 @@
 package uom.backend.physioassistant.services;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
@@ -44,11 +45,11 @@ public class PatientService {
 
     public Patient createPatient(CreatePatientRequest patientRequest) {
         // Make sure the patient is not already added
-        String givenAMKA = patientRequest.getUsername();
-        Optional<Patient> foundPatient = patientRepository.findById(givenAMKA);
+        String givenId = patientRequest.getUsername();
+        Optional<Patient> foundPatient = patientRepository.findById(givenId);
 
         if (foundPatient.isPresent())
-            throw new AlreadyAddedException("Patient with AMKA: " + givenAMKA + " is already added.");
+            throw new EntityExistsException("Patient with AMKA: " + givenId + " is already added.");
 
         String givenName = patientRequest.getName();
         String givenAddress = patientRequest.getAddress();
@@ -59,7 +60,7 @@ public class PatientService {
         Doctor doctor = doctorService.getById(doctorId);
 
         Patient patient = new Patient();
-        patient.setAmka(givenAMKA);
+        patient.setAmka(givenId);
         patient.setName(givenName);
         patient.setDoctor(doctor);
         patient.setAddress(givenAddress);

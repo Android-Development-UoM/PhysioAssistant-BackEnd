@@ -1,7 +1,9 @@
 package uom.backend.physioassistant.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.PhysioAction;
 import uom.backend.physioassistant.services.PhysioActionService;
 
@@ -35,10 +37,24 @@ public class PhysioActionController {
     // Will be used for R2
     @PostMapping("/create")
     public ResponseEntity<PhysioAction> createPhysioAction(@RequestBody PhysioAction action) {
-        this.physioActionService.createPhysioAction(action);
+        try {
+            this.physioActionService.createPhysioAction(action);
 
-        return ResponseEntity.ok()
-                .body(action);
+            return ResponseEntity.ok()
+                    .body(action);
+        }
+        catch (AlreadyAddedException e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(null);
+        }
+        catch (RuntimeException e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(null);
+        }
     }
 
     @DeleteMapping("/delete/{id}")

@@ -1,5 +1,6 @@
 package uom.backend.physioassistant.controllers;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +72,7 @@ public class PatientController implements Authentication {
             return ResponseEntity.ok()
                     .body(addedPatient);
         }
-        catch (AlreadyAddedException e) {
+        catch (EntityExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .build();
         }
