@@ -111,14 +111,14 @@ class PatientServiceTest {
         Collection<Patient> expectedPatients = new ArrayList<>();
         expectedPatients.add(patient1);
         expectedPatients.add(patient2);
-        when(patientRepository.getAllByDoctorIdAndAmka(doctorId, amka)).thenReturn(expectedPatients);
+        when(patientRepository.getAllByDoctorIdAndPatientUsername(doctorId, amka)).thenReturn(expectedPatients);
 
         // Act
-        Collection<Patient> actualPatients = patientService.getDoctorPatientsByAmka(doctorId, amka);
+        Collection<Patient> actualPatients = patientService.getDoctorPatientsByUsername(doctorId, amka);
 
         // Assert
         assertThat(actualPatients).isEqualTo(expectedPatients);
-        verify(patientRepository).getAllByDoctorIdAndAmka(doctorId, amka);
+        verify(patientRepository).getAllByDoctorIdAndPatientUsername(doctorId, amka);
     }
 
     @Test

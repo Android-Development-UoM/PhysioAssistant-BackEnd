@@ -9,11 +9,9 @@ import uom.backend.physioassistant.auth.Authentication;
 import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
-import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.services.PatientService;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -56,9 +54,9 @@ public class PatientController implements Authentication {
     }
 
 
-    @GetMapping("/amka/{amka}")
-    public ResponseEntity<List<Patient>> getAllByDoctorIdAndAmka(@PathVariable String amka, @RequestParam(name = "did") String doctorId) {
-        List<Patient> patients = (List) this.patientService.getDoctorPatientsByAmka(doctorId, amka);
+    @GetMapping("/pid/{patientId}/did/{doctorId}")
+    public ResponseEntity<List<Patient>> getAllByDoctorIdAndAmka(@PathVariable String patientId, @PathVariable String doctorId) {
+        List<Patient> patients = (List) this.patientService.getDoctorPatientsByUsername(doctorId, patientId);
 
         return ResponseEntity.ok()
                 .body(patients);
@@ -102,8 +100,14 @@ public class PatientController implements Authentication {
             String correctPassword = foundPatient.getPassword();
 
             // Check if password is correct
-            if (password.equals(correctPassword))
-                return ResponseEntity.ok(new LoginResponse(foundPatient));
+            if (password.equals(correctPassword)) {
+                LoginResponse loginResponse = new LoginResponse(foundPatient);
+                loginResponse.setDoctorId(foundPatient.getDoctor().getUsername());
+
+                return ResponseEntity.ok()
+                        .body(loginResponse);
+            }
+
             else
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new LoginResponse("Wrong username or password."));

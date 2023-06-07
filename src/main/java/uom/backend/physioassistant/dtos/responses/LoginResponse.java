@@ -7,6 +7,7 @@ import uom.backend.physioassistant.models.users.User;
 @Getter @Setter
 public class LoginResponse {
     private User user;
+    private String doctorId;
     private String errorMessage;
     public LoginResponse(User user) {
         this.user = user;

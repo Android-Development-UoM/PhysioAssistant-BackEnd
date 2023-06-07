@@ -11,6 +11,6 @@ public interface PatientRepository extends JpaRepository<Patient, String> {
     @Query("SELECT p FROM Patient p WHERE p.doctor.username = ?1")
     Collection<Patient> getAllByDoctorId(String doctorId);
 
-    @Query("SELECT p FROM Patient p WHERE p.doctor.username = ?1 and p.amka = ?2")
-    Collection<Patient> getAllByDoctorIdAndAmka(String doctorId, String amka);
+    @Query("SELECT p FROM Patient p WHERE p.doctor.username = ?1 and p.username = ?2")
+    Collection<Patient> getAllByDoctorIdAndPatientUsername(String doctorId, String username);
 }

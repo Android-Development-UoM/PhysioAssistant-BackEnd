@@ -4,7 +4,6 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
-import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.repositories.PatientRepository;
@@ -39,8 +38,8 @@ public class PatientService {
         return foundPatient.get();
     }
 
-    public Collection<Patient> getDoctorPatientsByAmka(String doctorId, String amka) {
-        return this.patientRepository.getAllByDoctorIdAndAmka(doctorId, amka);
+    public Collection<Patient> getDoctorPatientsByUsername(String doctorId, String patientUsername) {
+        return this.patientRepository.getAllByDoctorIdAndPatientUsername(doctorId, patientUsername);
     }
 
     public Patient createPatient(CreatePatientRequest patientRequest) {
