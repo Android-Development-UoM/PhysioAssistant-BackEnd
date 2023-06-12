@@ -31,7 +31,7 @@ public class Visit {
     private Collection<PhysioAction> physioActions;
 
     @Column(nullable = false)
-    private double totalPrice;
+    private double totalPrice = 0.0;
 
     public Visit(Appointment appointment, Collection<PhysioAction> physioActions) {
         this.appointment = appointment;
@@ -40,13 +40,13 @@ public class Visit {
     }
 
     public void calculateTotalPrice() {
-        double totalPrice = 0.0;
+        this.totalPrice = 0.0;
+
         if (physioActions != null) {
             for (PhysioAction physioAction : physioActions) {
-                totalPrice += physioAction.getCostPerSession();
+                this.totalPrice += physioAction.getCostPerSession();
             }
         }
-        this.totalPrice = totalPrice;
     }
 
 }
