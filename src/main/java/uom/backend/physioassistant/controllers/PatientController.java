@@ -32,15 +32,15 @@ public class PatientController implements Authentication {
                 .body(patients);
     }
 
-    @GetMapping("/doctor")
+   /* @GetMapping("/doctor")
     public ResponseEntity<List> getAllPatientsByDoctorId(@RequestParam(name = "did") String doctorId) {
         List<Patient> patients = (List) patientService.getAllPatientsByDoctorId(doctorId);
 
         return ResponseEntity.ok()
                 .body(patients);
-    }
+    }*/
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable String id) {
         try {
             Patient foundPatient = patientService.getPatientById(id);
@@ -54,16 +54,29 @@ public class PatientController implements Authentication {
         }
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Patient> getPatientByUsername(@PathVariable String username) {
+        try {
+            Patient foundPatient = patientService.getPatientByUsername(username);
 
-    @GetMapping("/amka/{amka}")
+            return ResponseEntity.ok()
+                    .body(foundPatient);
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
+    }
+
+   /* @GetMapping("/amka/{amka}")
     public ResponseEntity<List<Patient>> getAllByDoctorIdAndAmka(@PathVariable String amka, @RequestParam(name = "did") String doctorId) {
         List<Patient> patients = (List) this.patientService.getDoctorPatientsByAmka(doctorId, amka);
 
         return ResponseEntity.ok()
                 .body(patients);
-    }
+    }*/
 
-    @PostMapping("/create")
+    /*@PostMapping("/create")
     public ResponseEntity<Patient> createPatient(@RequestBody CreatePatientRequest patientRequest) {
         try {
             Patient addedPatient = patientService.createPatient(patientRequest);
@@ -75,7 +88,7 @@ public class PatientController implements Authentication {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .build();
         }
-    }
+    }*/
 
     @DeleteMapping("/{id}")
     public ResponseEntity deletePatient(@PathVariable String id) {
@@ -97,7 +110,7 @@ public class PatientController implements Authentication {
         String password = loginRequest.getPassword();
 
         try {
-            Patient foundPatient = patientService.getPatientById(username);
+            Patient foundPatient = patientService.getPatientByUsername(username);
             String correctPassword = foundPatient.getPassword();
 
             // Check if password is correct

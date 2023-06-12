@@ -14,6 +14,7 @@ import java.time.LocalTime;
 public class CreateAppointmentRequest {
     String doctorId;
     String patientId;
+    String physioActionId;
     LocalDate date;
     LocalTime time;
 }

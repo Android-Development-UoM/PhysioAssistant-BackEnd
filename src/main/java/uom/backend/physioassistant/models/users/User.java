@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter @Setter
 @MappedSuperclass
 public abstract class User {
-    @Id
+    @Column(nullable = false)
     private String username;
     @Column(nullable = false)
     private String password;

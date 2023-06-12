@@ -7,27 +7,27 @@ import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.repositories.PatientRepository;
+import uom.backend.physioassistant.utils.AccountGenerator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
 @Service
 public class PatientService {
     private final PatientRepository patientRepository;
-    private final DoctorService doctorService;
 
-    public PatientService(PatientRepository patientRepository, DoctorService doctorService) {
+    public PatientService(PatientRepository patientRepository) {
         this.patientRepository = patientRepository;
-        this.doctorService = doctorService;
     }
 
     public Collection<Patient> getAllPatients() {
         return patientRepository.findAll();
     }
 
-    public Collection<Patient> getAllPatientsByDoctorId(String doctorId) {
+   /* public Collection<Patient> getAllPatientsByDoctorId(String doctorId) {
         return patientRepository.getAllByDoctorId(doctorId);
-    }
+    }*/
 
     public Patient getPatientById(String id) {
         Optional<Patient> foundPatient = patientRepository.findById(id);
@@ -38,13 +38,22 @@ public class PatientService {
         return foundPatient.get();
     }
 
-    public Collection<Patient> getDoctorPatientsByAmka(String doctorId, String amka) {
-        return this.patientRepository.getAllByDoctorIdAndAmka(doctorId, amka);
+    public Patient getPatientByUsername(String username){
+        Optional<Patient> foundPatient = patientRepository.findByUsername(username);
+        if(foundPatient.isEmpty()){
+            throw new EntityNotFoundException("Patient with username: "+username+" not found");
+        }
+
+        return foundPatient.get();
     }
+
+    /*public Collection<Patient> getDoctorPatientsByAmka(String doctorId, String amka) {
+        return this.patientRepository.getAllByDoctorIdAndAmka(doctorId, amka);
+    }*/
 
     public Patient createPatient(CreatePatientRequest patientRequest) {
         // Make sure the patient is not already added
-        String givenAMKA = patientRequest.getUsername();
+        String givenAMKA = patientRequest.getAmka();
         Optional<Patient> foundPatient = patientRepository.findById(givenAMKA);
 
         if (foundPatient.isPresent())
@@ -52,19 +61,13 @@ public class PatientService {
 
         String givenName = patientRequest.getName();
         String givenAddress = patientRequest.getAddress();
-        String givenUsername = patientRequest.getUsername();
-        String givenPassword = patientRequest.getPassword();
-        String doctorId = patientRequest.getDoctorId();
-
-        Doctor doctor = doctorService.getById(doctorId);
 
         Patient patient = new Patient();
         patient.setAmka(givenAMKA);
         patient.setName(givenName);
-        patient.setDoctor(doctor);
         patient.setAddress(givenAddress);
-        patient.setUsername(givenUsername);
-        patient.setPassword(givenPassword);
+        patient.setUsername(AccountGenerator.generateUniqueUsername((ArrayList<String>) patientRepository.getAllUsernames()));
+        patient.setPassword(AccountGenerator.generatePassword());
 
         return patientRepository.save(patient);
     }
@@ -73,4 +76,7 @@ public class PatientService {
         Patient patient = this.getPatientById(id);
         patientRepository.delete(patient);
     }
+
+
+
 }

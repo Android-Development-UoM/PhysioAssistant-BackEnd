@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uom.backend.physioassistant.models.PhysioAction;
 import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.models.users.Patient;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -23,14 +23,16 @@ public class Appointment {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "doctor_id", referencedColumnName = "username")
-    @JsonIgnore
+    @JoinColumn(name = "doctor_id", referencedColumnName = "afm")
     private Doctor doctor;
 
     @ManyToOne
-    @JoinColumn(name = "patient_id", referencedColumnName = "username")
-    @JsonIgnore
+    @JoinColumn(name = "patient_id", referencedColumnName = "amka")
     private Patient patient;
+
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private PhysioAction physioAction;
 
     @Column(nullable = false)
     private LocalDate date;
