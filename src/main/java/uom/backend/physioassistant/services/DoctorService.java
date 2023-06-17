@@ -82,7 +82,7 @@ public class DoctorService {
         Optional<Doctor> optionalDoctor = doctorRepository.findById(doctorId);
 
         if (optionalDoctor.isEmpty())
-            throw new EntityNotFoundException("Doctor with afm: " + doctorId + " not found.");
+            throw new EntityNotFoundException("Doctor with id: " + doctorId + " not found.");
 
         Doctor doctor = optionalDoctor.get();
 
@@ -90,17 +90,11 @@ public class DoctorService {
         Optional<Patient> optionalPatient = patientRepository.findById(amka);
 
         if (optionalPatient.isPresent()) {
-            doctor.getPatients()
-                    .stream()
-                    .forEach(patient1 -> {
-                        if (patient1.getAmka().equals(amka))
-                            throw new AlreadyAddedException("Patient with amka: " + amka + " is already added.");
-                    });
+            throw new AlreadyAddedException("Patient with amka: " + amka + " is already added.");
         }
 
-        Patient patient = optionalPatient.orElseGet(() -> patientService.createPatient(patientRequest));
+        Patient patient = patientService.createPatient(patientRequest);
         patient.getDoctors().add(doctor);
-        patientRepository.save(patient);
 
         doctor.getPatients().add(patient);
         doctorRepository.save(doctor);
