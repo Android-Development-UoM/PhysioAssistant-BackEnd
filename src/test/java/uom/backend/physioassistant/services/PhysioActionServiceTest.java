@@ -73,7 +73,7 @@ class PhysioActionServiceTest {
 
 
     @Test
-    public void testGetById_WhenValidPhysioActionId_ShouldRetrievePhysioAction() {
+    public void testGetById_ShouldRetrievePhysioAction() {
         // Given
         String physioActionId = "1";
         PhysioAction expectedPhysioAction = new PhysioAction();
@@ -91,7 +91,7 @@ class PhysioActionServiceTest {
     }
 
     @Test
-    public void testGetById_WhenInvalidPhysioActionId_ShouldThrowNotFoundException() {
+    public void testGetById_ShouldThrowNotFoundException() {
         // Given
         String physioActionId = "1";
 
@@ -123,7 +123,7 @@ class PhysioActionServiceTest {
     }
 
     @Test
-    public void testDeleteById_WhenValidPhysioActionId_ShouldDeletePhysioAction() {
+    public void testDeleteById_ShouldDeletePhysioAction() {
         // Given
         String physioActionId = "1";
         PhysioAction physioAction = new PhysioAction();
@@ -140,7 +140,7 @@ class PhysioActionServiceTest {
     }
 
     @Test
-    public void testDeleteById_WhenInvalidPhysioActionId_ShouldThrowNotFoundException() {
+    public void testDeleteById_ShouldThrowNotFoundException() {
         // Given
         String physioActionId = "1";
 
