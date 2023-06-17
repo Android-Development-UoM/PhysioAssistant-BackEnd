@@ -85,13 +85,13 @@ public class AppointmentService {
 
     public List<Appointment> getAppointmentsForPatientWithDoctor(String patientId, String doctorId) {
         Patient patient = patientService.getPatientById(patientId);
-        if(patient==null){
-            throw new EntityNotFoundException("Patient with id "+patientId+" not found");
-        }
         Doctor doctor = doctorService.getById(doctorId);
-        if(doctor==null){
+
+        if(patient==null)
+            throw new EntityNotFoundException("Patient with id "+patientId+" not found");
+
+        if(doctor==null)
             throw new EntityNotFoundException("Doctor with id "+doctorId+" not found");
-        }
 
 
         return appointmentRepository.getAppointmentsForPatientWithDoctor(patientId, doctorId);
