@@ -32,14 +32,6 @@ public class PatientController implements Authentication {
                 .body(patients);
     }
 
-   /* @GetMapping("/doctor")
-    public ResponseEntity<List> getAllPatientsByDoctorId(@RequestParam(name = "did") String doctorId) {
-        List<Patient> patients = (List) patientService.getAllPatientsByDoctorId(doctorId);
-
-        return ResponseEntity.ok()
-                .body(patients);
-    }*/
-
     @GetMapping("/id/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable String id) {
         try {
@@ -67,28 +59,6 @@ public class PatientController implements Authentication {
                     .build();
         }
     }
-
-   /* @GetMapping("/amka/{amka}")
-    public ResponseEntity<List<Patient>> getAllByDoctorIdAndAmka(@PathVariable String amka, @RequestParam(name = "did") String doctorId) {
-        List<Patient> patients = (List) this.patientService.getDoctorPatientsByAmka(doctorId, amka);
-
-        return ResponseEntity.ok()
-                .body(patients);
-    }*/
-
-    /*@PostMapping("/create")
-    public ResponseEntity<Patient> createPatient(@RequestBody CreatePatientRequest patientRequest) {
-        try {
-            Patient addedPatient = patientService.createPatient(patientRequest);
-
-            return ResponseEntity.ok()
-                    .body(addedPatient);
-        }
-        catch (AlreadyAddedException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .build();
-        }
-    }*/
 
     @DeleteMapping("/{id}")
     public ResponseEntity deletePatient(@PathVariable String id) {
