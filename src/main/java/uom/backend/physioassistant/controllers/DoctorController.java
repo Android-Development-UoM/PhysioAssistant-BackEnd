@@ -82,7 +82,7 @@ public class DoctorController implements Authentication {
                     .body(doctor);
         }
         catch (AlreadyAddedException e) {
-            String errorMsg = "Ο Γιατρός με username: " + doctor.getUsername();
+            String errorMsg = e.getMessage();
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(errorMsg);
         }

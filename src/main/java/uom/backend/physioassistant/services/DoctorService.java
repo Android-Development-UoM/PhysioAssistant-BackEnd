@@ -69,11 +69,17 @@ public class DoctorService {
     }
 
     public Doctor createDoctor(Doctor doctor) {
-        String givenAFM = doctor.getUsername();
+        String givenAFM = doctor.getAfm();
         Optional<Doctor> foundDoctor = this.doctorRepository.findById(givenAFM);
 
         if (foundDoctor.isPresent())
-            throw new AlreadyAddedException("Doctor with AFM: " + givenAFM + " is already added.");
+            throw new AlreadyAddedException("Ο γιατρός με ΑΦΜ: " + givenAFM + " υπάρχει ήδη.");
+
+        String giveUsername = doctor.getUsername();
+        foundDoctor = this.doctorRepository.findByUsername(giveUsername );
+        if(foundDoctor.isPresent()){
+            throw new AlreadyAddedException("Το username "+giveUsername+" υπάρχει ήδη");
+        }
 
         return doctorRepository.save(doctor);
     }

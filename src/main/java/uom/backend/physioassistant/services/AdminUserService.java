@@ -25,7 +25,7 @@ public class AdminUserService {
     }
 
     public Admin getAdminById(String id) {
-        Optional<Admin> foundAdmin = this.adminUserRepository.findById(id);
+        Optional<Admin> foundAdmin = this.adminUserRepository.findByUsername(id);
 
         if(foundAdmin.isEmpty())
             throw  new EntityNotFoundException("User with id: " + id + " not found.");
@@ -34,7 +34,7 @@ public class AdminUserService {
     }
 
     public boolean checkIfUserExists(String username) {
-        Optional<Admin> foundAdmin = this.adminUserRepository.findById(username);
+        Optional<Admin> foundAdmin = this.adminUserRepository.findByUsername(username);
 
         if (foundAdmin.isEmpty())
             return false;
@@ -44,10 +44,10 @@ public class AdminUserService {
 
     public Admin addAdminUser(Admin user) {
         String givenUsername = user.getUsername();
-        Optional<Admin> foundAdmin = this.adminUserRepository.findById(givenUsername);
+        Optional<Admin> foundAdmin = this.adminUserRepository.findByUsername(givenUsername);
 
         if (foundAdmin.isPresent())
-                throw new AlreadyAddedException("Username: " + givenUsername + " is taken");
+                throw new AlreadyAddedException("Το username: " + givenUsername + " υπάρχει ήδη");
         return (Admin) adminUserRepository.save(user);
     }
 
