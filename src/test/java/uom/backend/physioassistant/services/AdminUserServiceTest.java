@@ -49,7 +49,7 @@ class AdminUserServiceTest {
         // Given
         String id = "123";
         Admin admin = new Admin();
-        when(adminUserRepository.findById(id)).thenReturn(Optional.of(admin));
+        when(adminUserRepository.findById(Long.valueOf(id))).thenReturn(Optional.of(admin));
 
         // When
         Admin result = adminUserService.getAdminById(id);
