@@ -95,7 +95,14 @@
 			<version>5.2.0</version>
 			<scope>compile</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+		</dependency>
 	</dependencies>
+
+
 
 	<build>
 		<plugins>

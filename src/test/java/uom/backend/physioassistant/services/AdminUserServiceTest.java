@@ -1,117 +1,133 @@
 package uom.backend.physioassistant.services;
 
-import org.junit.jupiter.api.AfterEach;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
+import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.users.Admin;
 import uom.backend.physioassistant.repositories.AdminUserRepository;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class AdminUserServiceTest {
     @Mock
-    AdminUserRepository adminUserRepository;
-    AdminUserService classUnderTest;
+    private AdminUserRepository adminUserRepository;
+
+    @InjectMocks
+    private AdminUserService adminUserService;
 
     @BeforeEach
-    void setUp(TestInfo testInfo) {
-        System.out.println("----- Test " + testInfo.getDisplayName() + " Started -----");
-        classUnderTest = new AdminUserService(adminUserRepository);
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.out.println("---- Test Completed ----" + System.lineSeparator());
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void shouldGetAllAdmins() {
-        // WHEN
-        classUnderTest.getAllAdmins();
-        // THEN
-        verify(adminUserRepository).findAll();
-    }
-
-    @Test
-    void shouldGetAdminByID() {
+    void testGetAllAdmins() {
         // Given
-        Admin admin = new Admin();
-        admin.setUsername("admin");
-        admin.setPassword("admin");
-
-        given(adminUserRepository.findById(any(String.class)))
-                .willReturn(Optional.of(admin));
+        Admin admin1 = new Admin();
+        Admin admin2 = new Admin();
+        when(adminUserRepository.findAll()).thenReturn(Arrays.asList(admin1, admin2));
 
         // When
-        Admin foundAdmin = classUnderTest.getAdminById("admin");
+        Collection<Admin> admins = adminUserService.getAllAdmins();
 
         // Then
-        assertThat(foundAdmin).isEqualTo(admin);
+        assertThat(admins).containsExactlyInAnyOrder(admin1, admin2);
     }
 
     @Test
-    void shouldCheckIfUserExistsAndReturnTrue() {
+    void testGetAdminById_ExistingId_ShouldReturnAdmin() {
         // Given
+        Long id = 123L;
         Admin admin = new Admin();
-        admin.setUsername("admin");
-        admin.setPassword("admin");
+        admin.setId(id);
 
-        given(adminUserRepository.findById(any(String.class)))
-                .willReturn(Optional.of(admin));
+        adminUserRepository.save(admin);
+
+        when(adminUserRepository.findById(id)).thenReturn(Optional.of(admin));
 
         // When
-        boolean userExists = classUnderTest.checkIfUserExists("admin");
+        Admin result = adminUserService.getAdminById(String.valueOf(id));
 
         // Then
-        assertThat(userExists).isTrue();
+        assertThat(result).isEqualTo(admin);
     }
 
     @Test
-    void shouldCheckIfUserExistsAndReturnFalse() {
+    void testGetAdminById_NonExistingId_ShouldThrowEntityNotFoundException() {
         // Given
-        Admin admin = new Admin();
-        admin.setUsername("admin");
-        admin.setPassword("admin");
+        Long id = 123L;
+        when(adminUserRepository.findById(id)).thenReturn(Optional.empty());
 
-        given(adminUserRepository.findById(any(String.class)))
-                .willReturn(Optional.empty());
-
-        // When
-        boolean userExists = classUnderTest.checkIfUserExists("admin");
-
-        // Then
-        assertThat(userExists).isFalse();
+        // When and Then
+        assertThatThrownBy(() -> adminUserService.getAdminById(String.valueOf(id)))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("User with id: " + id + " not found.");
     }
 
     @Test
-    void shouldAddAdminWithoutException() {
+    void testCheckIfUserExists_ExistingUsername_ShouldReturnTrue() {
         // Given
-        Admin admin = new Admin();
-        admin.setUsername("admin");
-        admin.setPassword("admin");
+        String username = "testuser_true";
+        given(adminUserRepository.findByUsername(username)).willReturn(Optional.of(new Admin()));
 
         // When
-        classUnderTest.addAdminUser(admin);
+        boolean result = adminUserService.checkIfUserExists(username);
 
         // Then
-        ArgumentCaptor<Admin> adminArgumentCaptor =
-                ArgumentCaptor.forClass(Admin.class);
+        assertThat(result).isTrue();
+    }
 
-        verify(adminUserRepository)
-                .save(adminArgumentCaptor.capture());
+    @Test
+    void testCheckIfUserExists_NonExistingUsername_ShouldReturnFalse() {
+        // Given
+        String username = "testuser_false";
+        when(adminUserRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        Admin capturedAdmin = adminArgumentCaptor.getValue();
-        assertThat(admin).isEqualTo(capturedAdmin);
+        // When
+        boolean result = adminUserService.checkIfUserExists(username);
+
+        // Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void testAddAdminUser_NewUser_ShouldReturnAddedUser() {
+        // Given
+        Admin newUser = new Admin();
+        newUser.setUsername("newuser");
+        newUser.setId(1L);
+        when(adminUserRepository.findById(newUser.getId())).thenReturn(Optional.empty());
+        when(adminUserRepository.save(newUser)).thenReturn(newUser);
+
+        // When
+        Admin result = adminUserService.addAdminUser(newUser);
+
+        // Then
+        assertThat(result).isEqualTo(newUser);
+    }
+
+    @Test
+    void testAddAdminUser_ExistingUser_ShouldThrowAlreadyAddedException() {
+        // Given
+        Admin existingUser = new Admin();
+        existingUser.setId(1L);
+        existingUser.setUsername("existinguser");
+        when(adminUserRepository.findByUsername(existingUser.getUsername())).thenReturn(Optional.of(existingUser));
+
+        // When and Then
+        assertThatThrownBy(() -> adminUserService.addAdminUser(existingUser))
+                .isInstanceOf(AlreadyAddedException.class)
+                .hasMessage("Το username: existinguser υπάρχει ήδη");
     }
 }

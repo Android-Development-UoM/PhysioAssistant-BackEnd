@@ -23,4 +23,6 @@ public class PhysioAction {
     private String description;
     @Column(nullable = false)
     private double costPerSession;
+    @Column
+    private String imageURL;
 }

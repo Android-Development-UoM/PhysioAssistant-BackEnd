@@ -10,4 +10,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter @Setter
 @Table(name = "admin")
-public class Admin extends User { }
+public class Admin extends User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+}

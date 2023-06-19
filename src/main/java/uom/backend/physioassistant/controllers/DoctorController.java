@@ -5,11 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uom.backend.physioassistant.auth.Authentication;
+import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.users.Doctor;
+import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.services.DoctorService;
+import uom.backend.physioassistant.services.PatientService;
 
 import java.util.List;
 
@@ -17,9 +20,11 @@ import java.util.List;
 @RequestMapping("/api/doctors")
 public class DoctorController implements Authentication {
     private final DoctorService doctorService;
+    private final PatientService patientService;
 
-    public DoctorController(DoctorService doctorService) {
+    public DoctorController(DoctorService doctorService, PatientService patientService) {
         this.doctorService = doctorService;
+        this.patientService = patientService;
     }
 
     @GetMapping()
@@ -44,6 +49,28 @@ public class DoctorController implements Authentication {
         }
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Doctor> getDoctorByUsername(@PathVariable String username) {
+        try {
+            Doctor foundDoctor = doctorService.getDoctorByUsername(username);
+
+            return ResponseEntity.ok()
+                    .body(foundDoctor);
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
+    }
+
+    @GetMapping("/{doctorId}/patients")
+    public ResponseEntity<List<Patient>> getAllPatientsByDoctorId(@PathVariable String doctorId){
+        List<Patient> patients = doctorService.getAllPatientsByDoctorId(doctorId);
+        return ResponseEntity.ok().body(patients);
+    }
+
+
+
     // Will be used for R1
     @PostMapping("/create")
     public ResponseEntity<?> createDoctor(@RequestBody Doctor doctor) {
@@ -55,7 +82,7 @@ public class DoctorController implements Authentication {
                     .body(doctor);
         }
         catch (AlreadyAddedException e) {
-            String errorMsg = "Ο Γιατρός με username: " + doctor.getUsername();
+            String errorMsg = e.getMessage();
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(errorMsg);
         }
@@ -64,6 +91,14 @@ public class DoctorController implements Authentication {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(errorMsg);
         }
+    }
+
+    @PostMapping("/create-patient")
+    public ResponseEntity<Patient> createPatient(@RequestParam String doctorId,  @RequestBody CreatePatientRequest patientRequest){
+
+        Patient patient = doctorService.createPatient(doctorId,patientRequest);
+
+        return ResponseEntity.ok().body(patient);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -81,7 +116,7 @@ public class DoctorController implements Authentication {
         String password = loginRequest.getPassword();
 
         try {
-            Doctor foundDoctor = doctorService.getById(username);
+            Doctor foundDoctor = doctorService.getDoctorByUsername(username);
             String correctPassword = foundDoctor.getPassword();
 
             // Validate Password

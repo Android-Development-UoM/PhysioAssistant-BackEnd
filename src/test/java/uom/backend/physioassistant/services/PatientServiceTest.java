@@ -1,200 +1,126 @@
 package uom.backend.physioassistant.services;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
-import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.repositories.PatientRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 
 class PatientServiceTest {
-
     @Mock
     private PatientRepository patientRepository;
-
-    @Mock
-    private DoctorService doctorService;
-
-    @InjectMocks
     private PatientService patientService;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    public void setUp(TestInfo testInfo) {
+        patientRepository = Mockito.mock(PatientRepository.class);
+        patientService = new PatientService(patientRepository);
+
+        System.out.println("=====================================");
+        System.out.println("Starting test: " + testInfo.getDisplayName());
+    }
+
+    @AfterEach
+    void tearDown(TestInfo testInfo) {
+        System.out.println("Finished test: " + testInfo.getDisplayName());
+        System.out.println("=====================================");
     }
 
     @Test
-    void getAllPatients_ShouldReturnListOfPatients() {
-        // Arrange
-        Patient patient1 = new Patient();
-        Patient patient2 = new Patient();
-        Collection<Patient> expectedPatients = new ArrayList<>();
-        expectedPatients.add(patient1);
-        expectedPatients.add(patient2);
-        when(patientRepository.findAll()).thenReturn((List<Patient>) expectedPatients);
+    public void testCreatePatient_Success() {
+        // Given
+        CreatePatientRequest request = new CreatePatientRequest();
+        request.setAmka("123456789");
+        request.setName("John Doe");
+        request.setAddress("123 Main St");
 
-        // Act
-        Collection<Patient> actualPatients = patientService.getAllPatients();
+        Patient savedPatient = new Patient();
+        savedPatient.setAmka("123456789");
+        savedPatient.setName("John Doe");
+        savedPatient.setAddress("123 Main St");
+        savedPatient.setUsername("john.doe");
+        savedPatient.setPassword("password");
 
-        // Assert
-        assertThat(actualPatients).isEqualTo(expectedPatients);
-        verify(patientRepository).findAll();
+        given(patientRepository.findById("123456789")).willReturn(Optional.empty());
+        given(patientRepository.save(Mockito.any(Patient.class))).willReturn(savedPatient);
+
+        // When
+        Patient createdPatient = patientService.createPatient(request);
+
+        // Then
+        assertThat(savedPatient).isEqualTo(createdPatient);
     }
 
     @Test
-    void getAllPatientsByDoctorId_ValidDoctorId_ShouldReturnListOfPatients() {
-        // Arrange
-        String doctorId = "1";
-        Patient patient1 = new Patient();
-        Patient patient2 = new Patient();
-        Collection<Patient> expectedPatients = new ArrayList<>();
-        expectedPatients.add(patient1);
-        expectedPatients.add(patient2);
-        when(patientRepository.getAllByDoctorId(doctorId)).thenReturn(expectedPatients);
+    public void testCreatePatient_AlreadyAdded() {
+        // Given
+        CreatePatientRequest request = new CreatePatientRequest();
+        request.setAmka("123456789");
+        request.setName("John Doe");
+        request.setAddress("123 Main St");
 
-        // Act
-        Collection<Patient> actualPatients = patientService.getAllPatientsByDoctorId(doctorId);
+        Patient existingPatient = new Patient();
+        existingPatient.setAmka("123456789");
 
-        // Assert
-        assertThat(actualPatients).isEqualTo(expectedPatients);
-        verify(patientRepository).getAllByDoctorId(doctorId);
+        Mockito.when(patientRepository.findById("123456789")).thenReturn(Optional.of(existingPatient));
+
+        // When and Then
+        Assertions.assertThrows(EntityExistsException.class, () -> patientService.createPatient(request));
     }
 
     @Test
-    void getPatientById_ExistingId_ShouldReturnPatient() {
-        // Arrange
-        String id = "1";
+    public void testGetPatientById_Success() {
+        // Given
+        String patientId = "1";
         Patient expectedPatient = new Patient();
-        when(patientRepository.findById(id)).thenReturn(Optional.of(expectedPatient));
+        expectedPatient.setAmka(patientId);
 
-        // Act
-        Patient actualPatient = patientService.getPatientById(id);
+        given(patientRepository.findById(patientId)).willReturn(Optional.of(expectedPatient));
 
-        // Assert
-        assertThat(actualPatient).isEqualTo(expectedPatient);
-        verify(patientRepository).findById(id);
+        // When
+        Patient patient = patientService.getPatientById(patientId);
+
+        // Then
+        Assertions.assertEquals(expectedPatient, patient);
     }
 
     @Test
-    void getPatientById_NonexistentId_ShouldThrowEntityNotFoundException() {
-        // Arrange
-        String id = "1";
-        when(patientRepository.findById(id)).thenReturn(Optional.empty());
+    public void testGetPatientById_NotFound() {
+        // Given
+        String patientId = "1";
 
-        // Act and Assert
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> patientService.getPatientById(id));
-        verify(patientRepository).findById(id);
+        given(patientRepository.findById(patientId)).willReturn(Optional.empty());
+
+        // When and then
+        Assertions.assertThrows(EntityNotFoundException.class, () -> patientService.getPatientById(patientId));
     }
 
     @Test
-    void getDoctorPatientsByAmka_ValidDoctorIdAndAmka_ShouldReturnListOfPatients() {
-        // Arrange
-        String doctorId = "1";
-        String amka = "123456789";
-        Patient patient1 = new Patient();
-        Patient patient2 = new Patient();
-        Collection<Patient> expectedPatients = new ArrayList<>();
-        expectedPatients.add(patient1);
-        expectedPatients.add(patient2);
-        when(patientRepository.getAllByDoctorIdAndPatientUsername(doctorId, amka)).thenReturn(expectedPatients);
+    public void testGetAllPatients() {
+        // Given
+        List<Patient> expectedPatients = new ArrayList<>();
+        expectedPatients.add(new Patient());
+        expectedPatients.add(new Patient());
 
-        // Act
-        Collection<Patient> actualPatients = patientService.getDoctorPatientsByUsername(doctorId, amka);
+        given(patientRepository.findAll()).willReturn(expectedPatients);
 
-        // Assert
-        assertThat(actualPatients).isEqualTo(expectedPatients);
-        verify(patientRepository).getAllByDoctorIdAndPatientUsername(doctorId, amka);
-    }
+        // When
+        Collection<Patient> patients = patientService.getAllPatients();
 
-    @Test
-    void createPatient_NewPatient_ShouldSavePatient() {
-        // Arrange
-        CreatePatientRequest patientRequest = new CreatePatientRequest();
-        patientRequest.setUsername("123456789");
-        patientRequest.setName("John Doe");
-        patientRequest.setAddress("123 Main St");
-        patientRequest.setPassword("password");
-        patientRequest.setDoctorId("1");
-
-        Doctor doctor = new Doctor();
-        String doctorId = patientRequest.getDoctorId();
-        when(doctorService.getById(doctorId)).thenReturn(doctor);
-
-        Patient patient = new Patient();
-        patient.setAmka(patientRequest.getUsername());
-        patient.setName(patientRequest.getName());
-        patient.setDoctor(doctor);
-        patient.setAddress(patientRequest.getAddress());
-        patient.setUsername(patientRequest.getUsername());
-        patient.setPassword(patientRequest.getPassword());
-        when(patientRepository.findById(patientRequest.getUsername())).thenReturn(Optional.empty());
-        when(patientRepository.save(patient)).thenReturn(patient);
-
-        // Act
-        Patient createdPatient = patientService.createPatient(patientRequest);
-        System.out.println(patientService.createPatient(patientRequest));
-
-        // Assert
-        assertThat(createdPatient).isEqualTo(patient);
-        verify(doctorService).getById(doctorId);
-        verify(patientRepository).findById(patientRequest.getUsername());
-        verify(patientRepository).save(patient);
-    }
-
-    @Test
-    void createPatient_PatientAlreadyExists_ShouldThrowAlreadyAddedException() {
-        // Arrange
-        CreatePatientRequest patientRequest = new CreatePatientRequest();
-        patientRequest.setUsername("123456789");
-        when(patientRepository.findById(patientRequest.getUsername())).thenReturn(Optional.of(new Patient()));
-
-        // Act and Assert
-        assertThatExceptionOfType(AlreadyAddedException.class)
-                .isThrownBy(() -> patientService.createPatient(patientRequest));
-        verify(patientRepository).findById(patientRequest.getUsername());
-        verify(patientRepository, never()).save(any());
-    }
-
-    @Test
-    void deletePatientById_ExistingId_ShouldDeletePatient() {
-        // Arrange
-        String id = "1";
-        Patient expectedPatient = new Patient();
-        when(patientRepository.findById(id)).thenReturn(Optional.of(expectedPatient));
-
-        // Act
-        patientService.deletePatientById(id);
-
-        // Assert
-        verify(patientRepository).findById(id);
-        verify(patientRepository).delete(expectedPatient);
-    }
-
-    @Test
-    void deletePatientById_NonexistentId_ShouldThrowEntityNotFoundException() {
-        // Arrange
-        String id = "1";
-        when(patientRepository.findById(id)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> patientService.deletePatientById(id));
-        verify(patientRepository).findById(id);
-        verify(patientRepository, never()).delete(any());
+        // Then
+        Assertions.assertEquals(expectedPatients, patients);
     }
 }

@@ -31,15 +31,7 @@ public class PatientController implements Authentication {
                 .body(patients);
     }
 
-    @GetMapping("/doctor")
-    public ResponseEntity<List> getAllPatientsByDoctorId(@RequestParam(name = "did") String doctorId) {
-        List<Patient> patients = (List) patientService.getAllPatientsByDoctorId(doctorId);
-
-        return ResponseEntity.ok()
-                .body(patients);
-    }
-
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable String id) {
         try {
             Patient foundPatient = patientService.getPatientById(id);
@@ -53,25 +45,16 @@ public class PatientController implements Authentication {
         }
     }
 
-
-    @GetMapping("/pid/{patientId}/did/{doctorId}")
-    public ResponseEntity<List<Patient>> getAllByDoctorIdAndAmka(@PathVariable String patientId, @PathVariable String doctorId) {
-        List<Patient> patients = (List) this.patientService.getDoctorPatientsByUsername(doctorId, patientId);
-
-        return ResponseEntity.ok()
-                .body(patients);
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<Patient> createPatient(@RequestBody CreatePatientRequest patientRequest) {
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Patient> getPatientByUsername(@PathVariable String username) {
         try {
-            Patient addedPatient = patientService.createPatient(patientRequest);
+            Patient foundPatient = patientService.getPatientByUsername(username);
 
             return ResponseEntity.ok()
-                    .body(addedPatient);
+                    .body(foundPatient);
         }
-        catch (EntityExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .build();
         }
     }
@@ -96,13 +79,13 @@ public class PatientController implements Authentication {
         String password = loginRequest.getPassword();
 
         try {
-            Patient foundPatient = patientService.getPatientById(username);
+            Patient foundPatient = patientService.getPatientByUsername(username);
             String correctPassword = foundPatient.getPassword();
 
             // Check if password is correct
             if (password.equals(correctPassword)) {
                 LoginResponse loginResponse = new LoginResponse(foundPatient);
-                loginResponse.setDoctorId(foundPatient.getDoctor().getUsername());
+                // loginResponse.setDoctorId(foundPatient.getDoctor().getUsername());
 
                 return ResponseEntity.ok()
                         .body(loginResponse);

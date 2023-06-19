@@ -1,12 +1,15 @@
 package uom.backend.physioassistant.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uom.backend.physioassistant.dtos.requests.CreateAppointmentRequest;
+import uom.backend.physioassistant.models.PhysioAction;
 import uom.backend.physioassistant.models.appointment.Appointment;
 import uom.backend.physioassistant.models.appointment.AppointmentStatus;
 import uom.backend.physioassistant.models.users.Doctor;
@@ -16,16 +19,21 @@ import uom.backend.physioassistant.repositories.AppointmentRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-public class AppointmentServiceTest {
-
+class AppointmentServiceTest {
     @Mock
     private AppointmentRepository appointmentRepository;
 
@@ -35,193 +43,277 @@ public class AppointmentServiceTest {
     @Mock
     private PatientService patientService;
 
+    @Mock
+    private PhysioActionService physioActionService;
+
     @InjectMocks
     private AppointmentService appointmentService;
 
     @BeforeEach
-    public void setup() {
+    void setUp(TestInfo testInfo) {
         MockitoAnnotations.openMocks(this);
+
+        System.out.println("=====================================");
+        System.out.println("Starting test: " + testInfo.getDisplayName());
     }
 
-    @Test
-    public void testGetAppointmentById_ExistingAppointmentId_ReturnsAppointment() {
-        // Arrange
-        Long appointmentId = 1L;
-        Appointment appointment = new Appointment();
-        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+    @AfterEach
+    void tearDown(TestInfo testInfo) {
+        System.out.println("Finished test: " + testInfo.getDisplayName());
+        System.out.println("=====================================");
+    }
 
-        // Act
+
+    @Test
+    void testGetAppointmentById_ShouldReturnAppointment() {
+        // Given
+        long appointmentId = 1L;
+        Appointment appointment = new Appointment();
+        appointment.setId(appointmentId);
+
+        given(appointmentRepository.findById(appointmentId))
+                .willReturn(Optional.of(appointment));
+
+        // When
         Appointment result = appointmentService.getAppointmentById(appointmentId);
 
-        // Assert
-        assertThat(result).isEqualTo(appointment);
-        verify(appointmentRepository, times(1)).findById(appointmentId);
+        // Then
+        assertEquals(appointment, result);
     }
 
     @Test
-    public void testGetAppointmentById_NonExistingAppointmentId_ThrowsEntityNotFoundException() {
-        // Arrange
-        Long nonExistingAppointmentId = 100L;
-        when(appointmentRepository.findById(nonExistingAppointmentId)).thenReturn(Optional.empty());
+    void testGetAppointmentById_NonExistingId_ShouldThrowEntityNotFoundException() {
+        // Given
+        long appointmentId = 1L;
+
+        given(appointmentRepository.findById(appointmentId))
+                .willReturn(Optional.empty());
 
         // Act and Assert
-        assertThatThrownBy(() -> appointmentService.getAppointmentById(nonExistingAppointmentId))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Appointment with id: " + nonExistingAppointmentId + " not found.");
-        verify(appointmentRepository, times(1)).findById(nonExistingAppointmentId);
+        assertThrows(EntityNotFoundException.class, () -> appointmentService.getAppointmentById(appointmentId));
     }
 
     @Test
-    public void testCreateAppointment_ValidRequest_ReturnsCreatedAppointment() {
-        // Arrange
-        CreateAppointmentRequest appointmentRequest = new CreateAppointmentRequest();
-        appointmentRequest.setDoctorId("doctor1");
-        appointmentRequest.setPatientId("patient1");
-        appointmentRequest.setDate(LocalDate.now());
-        appointmentRequest.setTime(LocalTime.now());
+    void testCreateAppointment_ValidRequest_ShouldReturnCreatedAppointment() {
+        // Given
+        CreateAppointmentRequest request = new CreateAppointmentRequest();
+        request.setDoctorId("doctorId");
+        request.setPatientId("patientId");
+        request.setPhysioActionId("physioActionId");
+        request.setDate(LocalDate.now());
+        request.setTime(LocalTime.now());
 
         Doctor doctor = new Doctor();
-        when(doctorService.getById(appointmentRequest.getDoctorId())).thenReturn(doctor);
+        given(doctorService.getById(request.getDoctorId()))
+                .willReturn(doctor);
 
         Patient patient = new Patient();
-        when(patientService.getPatientById(appointmentRequest.getPatientId())).thenReturn(patient);
+        given(patientService.getPatientById(request.getPatientId()))
+                .willReturn(patient);
+
+        PhysioAction physioAction = new PhysioAction();
+        given(physioActionService.getById(request.getPhysioActionId()))
+                .willReturn(physioAction);
 
         Appointment savedAppointment = new Appointment();
-        when(appointmentRepository.save(any(Appointment.class))).thenReturn(savedAppointment);
+        savedAppointment.setId(1L);
+        savedAppointment.setPatient(patient);
+        savedAppointment.setDoctor(doctor);
+        savedAppointment.setPhysioAction(physioAction);
+        savedAppointment.setDate(request.getDate());
+        savedAppointment.setTime(request.getTime());
 
-        // Act
-        Appointment result = appointmentService.createAppointment(appointmentRequest);
+        given(appointmentRepository.save(any(Appointment.class)))
+                .willReturn(savedAppointment);
 
-        // Assert
-        assertThat(result).isEqualTo(savedAppointment);
-        verify(doctorService, times(1)).getById(appointmentRequest.getDoctorId());
-        verify(patientService, times(1)).getPatientById(appointmentRequest.getPatientId());
+        // When
+        Appointment result = appointmentService.createAppointment(request);
+
+        // Then
+        assertEquals(savedAppointment, result);
+        assertEquals(doctor, result.getDoctor());
+        assertEquals(patient, result.getPatient());
+        assertEquals(physioAction, result.getPhysioAction());
+        assertEquals(request.getDate(), result.getDate());
+        assertEquals(request.getTime(), result.getTime());
+
         verify(appointmentRepository, times(1)).save(any(Appointment.class));
     }
 
     @Test
-    public void testGetAllAppointments_ReturnsAllAppointments() {
-        // Arrange
-        List<Appointment> appointments = new ArrayList<>();
-        appointments.add(new Appointment());
-        appointments.add(new Appointment());
-        when(appointmentRepository.findAll()).thenReturn(appointments);
 
-        // Act
+    void testGetAllAppointments_ShouldReturnAllAppointments() {
+        // Given
+        Appointment appointment1 = new Appointment();
+        Appointment appointment2 = new Appointment();
+
+        given(appointmentRepository.findAll())
+                .willReturn(Arrays.asList(appointment1, appointment2));
+
+        // When
         Collection<Appointment> result = appointmentService.getAllAppointments();
 
-        // Assert
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactlyElementsOf(appointments);
-        verify(appointmentRepository, times(1)).findAll();
+        // Then
+        assertEquals(2, result.size());
+        assertTrue(result.contains(appointment1));
+        assertTrue(result.contains(appointment2));
     }
 
     @Test
-    public void testGetAppointmentsBasedOnDoctorId_ReturnsAppointmentsForDoctorId() {
-        // Arrange
-        String doctorId = "doctor1";
-        List<Appointment> appointments = new ArrayList<>();
-        appointments.add(new Appointment());
-        appointments.add(new Appointment());
-        when(appointmentRepository.findAllByDoctorId(doctorId)).thenReturn(appointments);
+    void testGetAppointmentsBasedOnDoctorId_ShouldReturnAppointmentsForDoctor() {
+        // Given
+        String doctorId = "doctorId";
+        Appointment appointment1 = new Appointment();
+        Appointment appointment2 = new Appointment();
 
-        // Act
+        given(appointmentRepository.findAllByDoctorId(doctorId))
+                .willReturn(Arrays.asList(appointment1, appointment2));
+
+        // When
         Collection<Appointment> result = appointmentService.getAppointmentsBasedOnDoctorId(doctorId);
 
-        // Assert
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactlyElementsOf(appointments);
-        verify(appointmentRepository, times(1)).findAllByDoctorId(doctorId);
+        // Then
+        assertEquals(2, result.size());
+        assertTrue(result.contains(appointment1));
+        assertTrue(result.contains(appointment2));
     }
 
     @Test
-    public void testGetAppointmentsBasedOnPatientId_ReturnsAppointmentsForPatientId() {
-        // Arrange
-        String patientId = "patient1";
-        List<Appointment> appointments = new ArrayList<>();
-        appointments.add(new Appointment());
-        appointments.add(new Appointment());
-        when(appointmentRepository.findAllByPatientId(patientId)).thenReturn(appointments);
+    void testGetAppointmentsBasedOnPatientId_ShouldReturnAppointmentsForPatient() {
+        // Given
+        String patientId = "patientId";
+        Appointment appointment1 = new Appointment();
+        Appointment appointment2 = new Appointment();
 
-        // Act
+        given(appointmentRepository.findAllByPatientId(patientId))
+                .willReturn(Arrays.asList(appointment1, appointment2));
+        // When
         Collection<Appointment> result = appointmentService.getAppointmentsBasedOnPatientId(patientId);
 
-        // Assert
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactlyElementsOf(appointments);
-        verify(appointmentRepository, times(1)).findAllByPatientId(patientId);
+        // Then
+        assertEquals(2, result.size());
+        assertTrue(result.contains(appointment1));
+        assertTrue(result.contains(appointment2));
     }
 
     @Test
-    public void testGetAllForDoctorByStatus_ReturnsAppointmentsForDoctorIdAndStatus() {
-        // Arrange
-        String doctorId = "doctor1";
+    void testGetAllForDoctorByStatus_ShouldReturnAppointmentsForDoctorWithStatus() {
+        // Given
+        String doctorId = "doctorId";
         AppointmentStatus status = AppointmentStatus.ACCEPTED;
-        List<Appointment> appointments = new ArrayList<>();
-        appointments.add(new Appointment());
-        appointments.add(new Appointment());
-        when(appointmentRepository.findAllForDoctorByStatus(doctorId, status)).thenReturn(appointments);
+        Appointment appointment1 = new Appointment();
+        Appointment appointment2 = new Appointment();
 
-        // Act
+        given(appointmentRepository.findAllForDoctorByStatus(doctorId, status))
+                .willReturn(Arrays.asList(appointment1, appointment2));
+
+        // When
         Collection<Appointment> result = appointmentService.getAllForDoctorByStatus(doctorId, status);
 
-        // Assert
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactlyElementsOf(appointments);
-        verify(appointmentRepository, times(1)).findAllForDoctorByStatus(doctorId, status);
+        // Then
+        assertEquals(2, result.size());
+        assertTrue(result.contains(appointment1));
+        assertTrue(result.contains(appointment2));
     }
 
     @Test
-    public void testGetAllForPatientByStatus_ReturnsAppointmentsForPatientIdAndStatus() {
-        // Arrange
-        String patientId = "patient1";
+    void testGetAllForPatientByStatus_ShouldReturnAppointmentsForPatientWithStatus() {
+        // Given
+        String patientId = "patientId";
         AppointmentStatus status = AppointmentStatus.ACCEPTED;
-        List<Appointment> appointments = new ArrayList<>();
-        appointments.add(new Appointment());
-        appointments.add(new Appointment());
-        when(appointmentRepository.findAllForPatientByStatus(patientId, status)).thenReturn(appointments);
+        Appointment appointment1 = new Appointment();
+        Appointment appointment2 = new Appointment();
 
-        // Act
+        given(appointmentRepository.findAllForPatientByStatus(patientId, status))
+                .willReturn(Arrays.asList(appointment1, appointment2));
+
+        // When
         Collection<Appointment> result = appointmentService.getAllForPatientByStatus(patientId, status);
 
-        // Assert
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactlyElementsOf(appointments);
-        verify(appointmentRepository, times(1)).findAllForPatientByStatus(patientId, status);
+        // Then
+        assertEquals(2, result.size());
+        assertTrue(result.contains(appointment1));
+        assertTrue(result.contains(appointment2));
     }
 
     @Test
-    public void testSetAppointmentStatus_ValidAppointmentIdAndStatus_StatusUpdated() {
-        // Arrange
-        Long appointmentId = 1L;
+    void testSetAppointmentStatus_ValidAppointmentId_ShouldUpdateAppointmentStatus() {
+        // Given
+        long appointmentId = 1L;
         Appointment appointment = new Appointment();
-        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+        appointment.setStatus(AppointmentStatus.PENDING);
 
-        AppointmentStatus newStatus = AppointmentStatus.DONE;
+        given(appointmentRepository.findById(appointmentId))
+                .willReturn(Optional.of(appointment));
 
-        // Act
-        appointmentService.setAppointmentStatus(appointmentId, newStatus);
+        // When
+        appointmentService.setAppointmentStatus(appointmentId, AppointmentStatus.ACCEPTED);
 
-        // Assert
-        assertThat(appointment.getStatus()).isEqualTo(newStatus);
-        verify(appointmentRepository, times(1)).findById(appointmentId);
+        // Then
+        assertEquals(AppointmentStatus.ACCEPTED, appointment.getStatus());
         verify(appointmentRepository, times(1)).save(appointment);
     }
 
     @Test
-    public void testSetAppointmentStatus_NonExistingAppointmentId_ThrowsEntityNotFoundException() {
-        // Arrange
-        Long nonExistingAppointmentId = 100L;
-        when(appointmentRepository.findById(nonExistingAppointmentId)).thenReturn(Optional.empty());
+    void testSetAppointmentStatus_NonExistingAppointmentId_ShouldThrowEntityNotFoundException() {
+        // Given
+        long appointmentId = 1L;
 
-        AppointmentStatus newStatus = AppointmentStatus.DONE;
+        given(appointmentRepository.findById(appointmentId))
+                .willReturn(Optional.empty());
 
-        // Act and Assert
-        assertThatThrownBy(() -> appointmentService.setAppointmentStatus(nonExistingAppointmentId, newStatus))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Appointment with id: " + nonExistingAppointmentId + " not found.");
-        verify(appointmentRepository, times(1)).findById(nonExistingAppointmentId);
-        verify(appointmentRepository, never()).save(any(Appointment.class));
+        // When and Then
+        assertThrows(EntityNotFoundException.class, () -> appointmentService.setAppointmentStatus(appointmentId, AppointmentStatus.ACCEPTED));
+    }
+
+    @Test
+    void testGetAppointmentsForPatientWithDoctor_ValidIds_ShouldReturnAppointments() {
+        // Given
+        String patientId = "patientId";
+        String doctorId = "doctorId";
+        Patient patient = new Patient();
+        Doctor doctor = new Doctor();
+        List<Appointment> appointments = Arrays.asList(new Appointment(), new Appointment());
+
+        given(patientService.getPatientById(patientId)).willReturn(patient);
+        given(doctorService.getById(doctorId)).willReturn(doctor);
+        given(appointmentRepository.getAppointmentsForPatientWithDoctor(patientId, doctorId)).willReturn(appointments);
+
+        // When
+        List<Appointment> result = appointmentService.getAppointmentsForPatientWithDoctor(patientId, doctorId);
+
+        // Then
+        assertEquals(appointments, result);
+    }
+
+    @Test
+    void testGetAppointmentsForPatientWithDoctor_InvalidPatientId_ShouldThrowEntityNotFoundException() {
+        // Given
+        String patientId = "patientId";
+        String doctorId = "doctorId";
+        given(patientService.getPatientById(patientId)).willReturn(null);
+
+        // When and Then
+        assertThrows(EntityNotFoundException.class, () -> appointmentService.getAppointmentsForPatientWithDoctor(patientId, doctorId));
+
+        verify(appointmentRepository, never()).getAppointmentsForPatientWithDoctor(anyString(), anyString());
+    }
+
+    @Test
+    void testGetAppointmentsForPatientWithDoctor_InvalidDoctorId_ShouldThrowEntityNotFoundException() {
+        // Given
+        String patientId = "patientId";
+        String doctorId = "doctorId";
+
+        Patient patient = new Patient();
+        patient.setAmka(patientId);
+
+        given(patientService.getPatientById(patientId)).willReturn(patient);
+        given(doctorService.getById(doctorId)).willReturn(null);
+
+        // When and Then
+        assertThrows(EntityNotFoundException.class, () -> appointmentService.getAppointmentsForPatientWithDoctor(patientId, doctorId));
+
+        verify(appointmentRepository, never()).getAppointmentsForPatientWithDoctor(anyString(), anyString());
     }
 }
-
