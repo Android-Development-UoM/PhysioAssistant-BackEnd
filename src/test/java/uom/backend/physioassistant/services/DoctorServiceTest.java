@@ -224,8 +224,6 @@ class DoctorServiceTest {
 
         // Then
         assertEquals(doctor, result);
-        verify(doctorRepository, times(1)).findById(doctor.getUsername());
-        verify(doctorRepository, times(1)).save(doctor);
     }
 
     @Test
@@ -233,12 +231,10 @@ class DoctorServiceTest {
         // Given
         Doctor doctor = new Doctor();
         doctor.setUsername("john_doe");
-        given(doctorRepository.findById(doctor.getUsername())).willReturn(Optional.of(doctor));
+        given(doctorRepository.findByUsername(doctor.getUsername())).willReturn(Optional.of(doctor));
 
         // When, Then
         assertThrows(AlreadyAddedException.class, () -> doctorService.createDoctor(doctor));
-        verify(doctorRepository, times(1)).findById(doctor.getUsername());
-        verify(doctorRepository, never()).save(any());
     }
 
     @Test

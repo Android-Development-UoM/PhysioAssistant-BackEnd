@@ -25,7 +25,7 @@ public class AdminUserService {
     }
 
     public Admin getAdminById(String id) {
-        Optional<Admin> foundAdmin = this.adminUserRepository.findByUsername(id);
+        Optional<Admin> foundAdmin = this.adminUserRepository.findById(Long.valueOf(id));
 
         if(foundAdmin.isEmpty())
             throw  new EntityNotFoundException("User with id: " + id + " not found.");

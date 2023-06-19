@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 class AdminUserServiceTest {
@@ -47,12 +48,16 @@ class AdminUserServiceTest {
     @Test
     void testGetAdminById_ExistingId_ShouldReturnAdmin() {
         // Given
-        String id = "123";
+        Long id = 123L;
         Admin admin = new Admin();
-        when(adminUserRepository.findById(Long.valueOf(id))).thenReturn(Optional.of(admin));
+        admin.setId(id);
+
+        adminUserRepository.save(admin);
+
+        when(adminUserRepository.findById(id)).thenReturn(Optional.of(admin));
 
         // When
-        Admin result = adminUserService.getAdminById(id);
+        Admin result = adminUserService.getAdminById(String.valueOf(id));
 
         // Then
         assertThat(result).isEqualTo(admin);
@@ -61,11 +66,11 @@ class AdminUserServiceTest {
     @Test
     void testGetAdminById_NonExistingId_ShouldThrowEntityNotFoundException() {
         // Given
-        String id = "123";
+        Long id = 123L;
         when(adminUserRepository.findById(id)).thenReturn(Optional.empty());
 
         // When and Then
-        assertThatThrownBy(() -> adminUserService.getAdminById(id))
+        assertThatThrownBy(() -> adminUserService.getAdminById(String.valueOf(id)))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("User with id: " + id + " not found.");
     }
@@ -74,7 +79,7 @@ class AdminUserServiceTest {
     void testCheckIfUserExists_ExistingUsername_ShouldReturnTrue() {
         // Given
         String username = "testuser_true";
-        when(adminUserRepository.findById(username)).thenReturn(Optional.of(new Admin()));
+        given(adminUserRepository.findByUsername(username)).willReturn(Optional.of(new Admin()));
 
         // When
         boolean result = adminUserService.checkIfUserExists(username);
@@ -87,7 +92,7 @@ class AdminUserServiceTest {
     void testCheckIfUserExists_NonExistingUsername_ShouldReturnFalse() {
         // Given
         String username = "testuser_false";
-        when(adminUserRepository.findById(username)).thenReturn(Optional.empty());
+        when(adminUserRepository.findByUsername(username)).thenReturn(Optional.empty());
 
         // When
         boolean result = adminUserService.checkIfUserExists(username);
@@ -101,7 +106,8 @@ class AdminUserServiceTest {
         // Given
         Admin newUser = new Admin();
         newUser.setUsername("newuser");
-        when(adminUserRepository.findById(newUser.getUsername())).thenReturn(Optional.empty());
+        newUser.setId(1L);
+        when(adminUserRepository.findById(newUser.getId())).thenReturn(Optional.empty());
         when(adminUserRepository.save(newUser)).thenReturn(newUser);
 
         // When
@@ -115,12 +121,13 @@ class AdminUserServiceTest {
     void testAddAdminUser_ExistingUser_ShouldThrowAlreadyAddedException() {
         // Given
         Admin existingUser = new Admin();
+        existingUser.setId(1L);
         existingUser.setUsername("existinguser");
-        when(adminUserRepository.findById(existingUser.getUsername())).thenReturn(Optional.of(existingUser));
+        when(adminUserRepository.findByUsername(existingUser.getUsername())).thenReturn(Optional.of(existingUser));
 
         // When and Then
         assertThatThrownBy(() -> adminUserService.addAdminUser(existingUser))
                 .isInstanceOf(AlreadyAddedException.class)
-                .hasMessage("Username: " + existingUser.getUsername() + " is taken");
+                .hasMessage("Το username: existinguser υπάρχει ήδη");
     }
 }
