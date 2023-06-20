@@ -66,7 +66,7 @@ public class AdminController implements Authentication {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponse("Wrong username or password."));
 
-        Admin admin = this.adminUserService.getAdminById(username);
+        Admin admin = this.adminUserService.getAdminByUsername(username);
 
         String correctPassword = admin.getPassword();
 

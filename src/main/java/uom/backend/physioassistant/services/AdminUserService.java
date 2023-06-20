@@ -51,4 +51,11 @@ public class AdminUserService {
         return (Admin) adminUserRepository.save(user);
     }
 
+    public Admin getAdminByUsername(String username) {
+        Optional<Admin> foundAdmin = this.adminUserRepository.findByUsername(username);
+
+        if (foundAdmin.isEmpty())
+            throw new NotFoundException("Ο χρήστης με username: " + username + " δεν βρέθηκε");
+        return foundAdmin.get();
+    }
 }

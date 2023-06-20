@@ -22,7 +22,7 @@ public class Visit {
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "visit_physioactions",
             joinColumns = @JoinColumn(name = "visit_id"),

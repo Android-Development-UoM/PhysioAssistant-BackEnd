@@ -23,10 +23,10 @@ public class Doctor extends User{
     private String name;
     @Column(nullable = false)
     private String address;
-    @ManyToMany
+    @ManyToMany()
     @JsonIgnore
     @JoinTable(name = "doctor_patient",
-            joinColumns = @JoinColumn(name = "doctor_id"),
-            inverseJoinColumns = @JoinColumn(name = "patient_id"))
+            joinColumns = @JoinColumn(name = "afm"),
+            inverseJoinColumns = @JoinColumn(name = "amka"))
     private List<Patient> patients = new ArrayList<>();
 }
