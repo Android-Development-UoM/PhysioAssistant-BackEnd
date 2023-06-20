@@ -6,19 +6,23 @@ import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
 import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.models.users.Patient;
+import uom.backend.physioassistant.repositories.DoctorRepository;
 import uom.backend.physioassistant.repositories.PatientRepository;
 import uom.backend.physioassistant.utils.AccountGenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class PatientService {
     private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
 
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository,DoctorRepository doctorRepository) {
         this.patientRepository = patientRepository;
+        this.doctorRepository = doctorRepository;
     }
 
     public Collection<Patient> getAllPatients() {
@@ -41,6 +45,15 @@ public class PatientService {
         }
 
         return foundPatient.get();
+    }
+
+    public List<Doctor> getAllDoctorsByPatientId(String patientId) {
+        Optional<Patient> foundPatient = patientRepository.findById(patientId);
+        if(foundPatient.isEmpty()){
+            throw new EntityNotFoundException("Patient with amka: "+patientId+" not found");
+        }
+
+        return foundPatient.get().getDoctors();
     }
 
     public Patient createPatient(CreatePatientRequest patientRequest) {

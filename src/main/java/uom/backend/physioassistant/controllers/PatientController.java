@@ -9,6 +9,7 @@ import uom.backend.physioassistant.dtos.requests.CreatePatientRequest;
 import uom.backend.physioassistant.dtos.requests.LoginRequest;
 import uom.backend.physioassistant.dtos.responses.LoginResponse;
 import uom.backend.physioassistant.exceptions.AlreadyAddedException;
+import uom.backend.physioassistant.models.users.Doctor;
 import uom.backend.physioassistant.models.users.Patient;
 import uom.backend.physioassistant.services.PatientService;
 
@@ -53,6 +54,20 @@ public class PatientController implements Authentication {
 
             return ResponseEntity.ok()
                     .body(foundPatient);
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
+    }
+
+    @GetMapping("/doctors/{patientId}")
+    public ResponseEntity<List<Doctor>> getAllDoctorsByPatientId(@PathVariable String patientId) {
+        try {
+            List<Doctor> doctors = patientService.getAllDoctorsByPatientId(patientId);
+
+            return ResponseEntity.ok()
+                    .body(doctors);
         }
         catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
